@@ -1,0 +1,19 @@
+{
+    "name": "walace100/mvc",
+    "description": "templete mvc",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Walace Paz",
+            "email": "walacepaz11@gmail.com"
+        }
+    ],
+    "require": {
+        "PHP": "^7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lib\\": "lib/"
+        }
+    }
+}
