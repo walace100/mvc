@@ -4,5 +4,5 @@ namespace Lib\Routes;
 
 final class Route
 {
-    
+  
 }
