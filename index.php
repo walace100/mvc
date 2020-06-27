@@ -14,4 +14,13 @@ Route::get("/eae1", function(){
 
 Route::post("/aff", "Index", "index");
 
+Route::post("/oi/aff", "Home", "index");
+
+Route::get("/eaemano", function(){
+    echo "<form><input type='text' name='ae'><br><button>enviar</enviar></form>";
+});
+
+Route::get("/eae/{oi}/{eae}/{eae1}/eawe/", function(){
+});
+
 Route::run();
