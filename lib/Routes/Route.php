@@ -34,7 +34,7 @@ final class Route
     private static function routes(string $route, string $method, $action, string $function = null): void
     {
         $routesVal = self::parameters($route);
-        array_push(self::$routes, [
+        \array_push(self::$routes, [
             'route' => $route,
             'method' => $method,
             'action' => $action,
@@ -46,12 +46,13 @@ final class Route
     private static function parameters(string $route): array
     {
         $arrRoute = \explode('/', $route);
-        $isVal = preg_match_all('/({)(?<={)\w+(})/', $route);
+        $isVal = \preg_match_all('/({)(?<={)\w+(})/', $route);
         if ($isVal) {
             $routesVal = \preg_grep('/({)(?<={)\w+(})/', $arrRoute);
+            $keys = \array_keys($routesVal);
             return [
                 'variable' => true,
-                'routes' => $routesVal
+                'keys' => $routesVal
             ];
         } else {
             return [
@@ -79,14 +80,14 @@ final class Route
                 return $route;
             } elseif ($route['routesVal']['variable']) {
                 $arrRoutes = \explode('/', $route['route']);
-                if (count($arrRoutes) === count(self::$arrURI)) {
+                if (\count($arrRoutes) === \count(self::$arrURI)) {
                     $count = 0;
                     foreach (self::$arrURI as $key => $uri) {
                         if($uri === $arrRoutes[$key] || \preg_match('/{/', $arrRoutes[$key])) {
                             $count++;
                         }
                     }
-                    if ($count === count(self::$arrURI)) {
+                    if ($count === \count(self::$arrURI)) {
                         return $route;
                     }
                 }
@@ -97,13 +98,38 @@ final class Route
 
     private static function callController(array $route): void
     {
-        if (!is_string($route['action'])) {
-            \call_user_func($route['action']);
-        } elseif ($route['function']) {
-            $class = '\Controllers\\' . $route['action'];
-            $method = $route['function'];
-            (new $class)->$method();
+        if ($route['routesVal']['variable']) {
+            $param = self::getParameters($route['routesVal']['keys']);
+            if (!is_string($route['action'])) {
+                \call_user_func($route['action'], ...$param);
+            } elseif ($route['function']) {
+                $class = '\Controllers\\' . $route['action'];
+                $method = $route['function'];
+                (new $class)->$method(...$param);
+            }
+        } else {
+            if (!is_string($route['action'])) {
+                \call_user_func($route['action']);
+            } elseif ($route['function']) {
+                $class = '\Controllers\\' . $route['action'];
+                $method = $route['function'];
+                (new $class)->$method();
+            }
         }
+    }
+
+    private static function getParameters(array $keys): array
+    {
+        $uri = self::$arrURI;
+        $param = [];
+        foreach ($keys as $i => $value) {
+           if (\preg_match('/(?<![\w+])([1-9]+)$/', $uri[$i])) {
+                \array_push($param, (int) $uri[$i]);
+           } else {
+                \array_push($param, $uri[$i]);
+           }
+        }
+        return $param;
     }
 
     private static function setURL(): void
@@ -113,7 +139,7 @@ final class Route
 
     private static function getConstants(): void
     {
-        $root = dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, 2);
         require_once $root . '/config.php';
     }
 

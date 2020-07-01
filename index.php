@@ -12,7 +12,7 @@ Route::get("/eae1", function(){
     echo "eae";
 });
 
-Route::post("/aff", "Index", "index");
+Route::post("/aff/{num}/{num2}", "Index", "index");
 
 Route::post("/oi/aff", "Home", "index");
 
@@ -20,11 +20,11 @@ Route::get("/eaemano", function(){
     echo "<form><input type='text' name='ae'><br><button>enviar</enviar></form>";
 });
 
-Route::get("/eae/{oi}/{eae}/{eae1}/eawe/", function(){
-    echo "afawf";
+Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){
+    var_dump('<pre>' ,$a, $b, $c);
 });
 
-Route::get("/{oi}/video/{aff}", function (){
+Route::get("/{oi}/video/{aff}", function ($a, $b){
     echo "video";
 });
 

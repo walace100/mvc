@@ -4,8 +4,8 @@ namespace Controllers;
 
 class Index
 {
-    public function index()
+    public function index($eae, $af)
     {
-        echo "eaeaewawe";
+        echo "eaeaewawe $eae $af";
     }
 }
