@@ -21,6 +21,11 @@ Route::get("/eaemano", function(){
 });
 
 Route::get("/eae/{oi}/{eae}/{eae1}/eawe/", function(){
+    echo "afawf";
+});
+
+Route::get("/{oi}/video/{aff}", function (){
+    echo "video";
 });
 
 Route::run();
