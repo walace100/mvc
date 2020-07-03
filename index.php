@@ -25,11 +25,11 @@ Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){
 });
 
 Route::get("/{oi}/video/{aff}", function ($a, $b){
-    echo "video";
+    echo "$a $b";
 });
 
 Route::get("get", function(){
-    echo "<form method='post'><input type='text' name='ae'><br><button>enviar</button></form>";
+    echo "<form method='post' action='get/aff'><input type='text' name='ae'><br><button>enviar</button></form>";
 });
 
 Route::post("get/{af}", function($af){

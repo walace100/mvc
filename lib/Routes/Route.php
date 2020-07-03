@@ -78,35 +78,45 @@ final class Route
     {
         self::bootstrap();
         $route = self::verifyRoute();
-        if($route) { # tratar a resposta
+        if (!isset($route['response'])) {
            self::callController($route);
         } else {
-            header("HTTP/1.1 404");
-            echo '404';
+            header('HTTP/1.1 ' . $route['response']);
+            echo $route['response'];
         }
     }
 
     private static function verifyRoute(): array
     {
-        foreach (self::$routes as $route) {# verificar a metodo
+        foreach (self::$routes as $route) {
+            $arrRoutes = \explode('/', $route['route']);
             if ($route['route'] === self::$uri) {
-                return $route;
-            } elseif ($route['routesVal']['variable']) {
-                $arrRoutes = \explode('/', $route['route']);
-                if (\count($arrRoutes) === \count(self::$arrURI)) { #
-                    $count = 0;
-                    foreach (self::$arrURI as $key => $uri) {
-                        if($uri === $arrRoutes[$key] || \preg_match('/{/', $arrRoutes[$key])) {
-                            $count++;
-                        }
+                if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
+                    return $route;
+                }
+                return [
+                    'response' => 405
+                ];
+            } elseif ($route['routesVal']['variable'] && \count($arrRoutes) === \count(self::$arrURI)) {
+                $count = 0;
+                foreach (self::$arrURI as $key => $uri) {
+                    if ($uri === $arrRoutes[$key] || \preg_match('/{/', $arrRoutes[$key])) {
+                        $count++;
                     }
-                    if ($count === \count(self::$arrURI)) {
+                }
+                if ($count === \count(self::$arrURI)) {
+                    if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
                         return $route;
-                    }
+                    } 
+                    return [
+                        'response' => 405
+                    ];
                 }
             }
         } 
-        return []; # tratar a resposta
+        return [
+            'response' => 404
+        ];
     }
 
     private static function callController(array $route): void # tratar os parametros dos metodos e otimizar codigo
