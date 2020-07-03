@@ -17,7 +17,7 @@ final class Route
         self::setURL();
         self::getConstants();
         self::setURI();
-        self::cleanRoutes();
+        self::cleanURI();
         self::setArrURI();
     }
 
@@ -33,14 +33,26 @@ final class Route
 
     private static function routes(string $route, string $method, $action, string $function = null): void
     {
-        $routesVal = self::parameters($route);
+        $cleanRoute = self::cleanRoute($route);
+        $routesVal = self::parameters($cleanRoute);
         \array_push(self::$routes, [
-            'route' => $route,
+            'route' => $cleanRoute,
             'method' => $method,
             'action' => $action,
             'function' => $function,
             'routesVal' => $routesVal
         ]);
+    }
+
+    private static function cleanRoute(string $route): string
+    {
+        if (\preg_match('/\/$/', $route) && \strlen($route) > 1) {
+            $route = \substr($route, 0, \strlen($route) -1);
+        }
+        if (!preg_match('/^\//', $route) && \strlen($route) > 1) {
+            $route = '/'. $route;
+        }
+        return $route;
     }
 
     private static function parameters(string $route): array
@@ -66,21 +78,22 @@ final class Route
     {
         self::bootstrap();
         $route = self::verifyRoute();
-        if($route) {
+        if($route) { # tratar a resposta
            self::callController($route);
         } else {
+            header("HTTP/1.1 404");
             echo '404';
         }
     }
 
     private static function verifyRoute(): array
     {
-        foreach (self::$routes as $route) {
+        foreach (self::$routes as $route) {# verificar a metodo
             if ($route['route'] === self::$uri) {
                 return $route;
             } elseif ($route['routesVal']['variable']) {
                 $arrRoutes = \explode('/', $route['route']);
-                if (\count($arrRoutes) === \count(self::$arrURI)) {
+                if (\count($arrRoutes) === \count(self::$arrURI)) { #
                     $count = 0;
                     foreach (self::$arrURI as $key => $uri) {
                         if($uri === $arrRoutes[$key] || \preg_match('/{/', $arrRoutes[$key])) {
@@ -93,28 +106,21 @@ final class Route
                 }
             }
         } 
-        return [];
+        return []; # tratar a resposta
     }
 
-    private static function callController(array $route): void
+    private static function callController(array $route): void # tratar os parametros dos metodos e otimizar codigo
     {
+        $param = [];
         if ($route['routesVal']['variable']) {
             $param = self::getParameters($route['routesVal']['keys']);
-            if (!is_string($route['action'])) {
-                \call_user_func($route['action'], ...$param);
-            } elseif ($route['function']) {
-                $class = '\Controllers\\' . $route['action'];
-                $method = $route['function'];
-                (new $class)->$method(...$param);
-            }
-        } else {
-            if (!is_string($route['action'])) {
-                \call_user_func($route['action']);
-            } elseif ($route['function']) {
-                $class = '\Controllers\\' . $route['action'];
-                $method = $route['function'];
-                (new $class)->$method();
-            }
+        }
+        if (!is_string($route['action'])) {
+            \call_user_func($route['action'], ...$param);
+        } elseif ($route['function']) {
+            $class = '\Controllers\\' . $route['action'];
+            $method = $route['function'];
+            (new $class)->$method(...$param);
         }
     }
 
@@ -150,21 +156,12 @@ final class Route
         self::$uri = $uriFinal;
     }
 
-    private static function cleanRoutes(): void
+    private static function cleanURI(): void
     {
         if (\preg_match('/\/$/', self::$uri) && \strlen(self::$uri) > 1) {
             self::$uri = \substr(self::$uri, 0, \strlen(self::$uri) -1);
         }
-        foreach (self::$routes as $key => $routes) {
-            if (\preg_match('/\/$/', $routes['route']) && \strlen($routes['route']) > 1) {
-                $routes['route'] = \substr($routes['route'], 0, \strlen($routes['route']) -1);
-                self::$routes[$key]['route'] = $routes['route'];
-            }
-            if (!preg_match('/^\//', $routes['route']) && \strlen($routes['route']) > 1) {
-                $routes['route'] = '/'. $routes['route'];
-                self::$routes[$key]['route'] = $routes['route'];
-            }
-        }
+
     }
 
     private static function setArrURI(): void
