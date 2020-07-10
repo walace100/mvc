@@ -2,6 +2,9 @@
 
 namespace Lib\Routes;
 
+use Lib\Routes\Request;
+use ReflectionFunction;
+
 final class Route
 {
     private static $url;
@@ -119,14 +122,18 @@ final class Route
         ];
     }
 
-    private static function callController(array $route): void # tratar os parametros dos metodos e otimizar codigo
+    private static function callController(array $route): void #  mexer no $param, ver a posição e colocar o Request, e ver as possibilidades
     {
         $param = [];
         if ($route['routesVal']['variable']) {
             $param = self::getParameters($route['routesVal']['keys']);
         }
+        // $a = ['0', '1', '2', '3'];
+        // echo "<pre>"; print_r(array_splice($a, 0, 1, '1.1'));
+        // print_r(self::arrayInsert($a, 1, 'eae'));
+        #
         if (!is_string($route['action'])) {
-            \call_user_func($route['action'], ...$param);
+            \call_user_func($route['action'], new Request,...$param);
         } elseif ($route['function']) {
             $class = '\Controllers\\' . $route['action'];
             $method = $route['function'];
@@ -146,6 +153,25 @@ final class Route
            }
         }
         return $param;
+    }
+
+    private static function closureParams(object $closure): array
+    {
+        $arrayClosure = (new ReflectionFunction($closure))->getParameters();
+        return array_map(function ($array, $index) {
+            if ($array->getType() && $array->getType()->getName() == 'Lib\Routes\Request') {
+                return [
+                    'isRequest' => true,
+                    'position' => $index
+                ];
+            }
+            return [];
+        }, $arrayClosure, array_keys($arrayClosure));
+    }
+
+    private static function arrayInsert(array $array, int $position,  $insert): array
+    {
+        return array_splice($array, $position, 0, $insert);
     }
 
     private static function setURL(): void
@@ -171,7 +197,6 @@ final class Route
         if (\preg_match('/\/$/', self::$uri) && \strlen(self::$uri) > 1) {
             self::$uri = \substr(self::$uri, 0, \strlen(self::$uri) -1);
         }
-
     }
 
     private static function setArrURI(): void
