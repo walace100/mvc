@@ -2,8 +2,8 @@
 
 require_once 'lib/autoload.php';
 
-use Lib\Routes\Route;
-use Lib\Routes\Request;
+use Lib\Http\Route;
+use Lib\Http\Request;
 
 Route::get("/", function(){
     echo "fodase caralho";
@@ -25,8 +25,9 @@ Route::get("/eaemano", function(){
     echo "<form action='eaemano1/1'><input type='text' name='ae'><br><button>enviar</button></form>";
 });
 
-Route::get("/eaemano1/{1}", function(Request $val, $val2){
-    echo "af";
+Route::get("/eaemano1/{1}/", function($val2, Request $val){
+    echo $val2 . PHP_EOL;
+    echo $val->a();
 });
 
 Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){

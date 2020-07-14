@@ -1,12 +1,15 @@
 <?php
 
-namespace Lib\Routes;
+namespace Lib\Http;
 
-use Lib\Routes\Request;
+use Lib\Http\Request;
 use ReflectionFunction;
 
 final class Route
 {
+
+    private static $level = 2;
+
     private static $url;
 
     private static $uri;
@@ -128,12 +131,14 @@ final class Route
         if ($route['routesVal']['variable']) {
             $param = self::getParameters($route['routesVal']['keys']);
         }
-        // $a = ['0', '1', '2', '3'];
-        // echo "<pre>"; print_r(array_splice($a, 0, 1, '1.1'));
-        // print_r(self::arrayInsert($a, 1, 'eae'));
-        #
+        $closure = self::closureParams($route['action']);
+        $closurePos = self::closurePos($closure);
+        if (isset($closurePos)) {
+            self::arrayInsert($param, $closurePos, [new Request]);
+
+        }
         if (!is_string($route['action'])) {
-            \call_user_func($route['action'], new Request,...$param);
+            \call_user_func($route['action'], ...$param);
         } elseif ($route['function']) {
             $class = '\Controllers\\' . $route['action'];
             $method = $route['function'];
@@ -159,19 +164,27 @@ final class Route
     {
         $arrayClosure = (new ReflectionFunction($closure))->getParameters();
         return array_map(function ($array, $index) {
-            if ($array->getType() && $array->getType()->getName() == 'Lib\Routes\Request') {
+            if ($array->getType() && $array->getType()->getName() == 'Lib\Http\Request') {
                 return [
-                    'isRequest' => true,
                     'position' => $index
                 ];
             }
-            return [];
         }, $arrayClosure, array_keys($arrayClosure));
     }
 
-    private static function arrayInsert(array $array, int $position,  $insert): array
+    private static function closurePos(array $closurePos): ?int
     {
-        return array_splice($array, $position, 0, $insert);
+        foreach ($closurePos as $pos) {
+            if($pos){
+                return $pos['position'];
+            }
+        }
+        return null;
+    }
+
+    private static function arrayInsert(array &$array, int $position,  $insert): void
+    {
+        array_splice($array, $position, 0, $insert);
     }
 
     private static function setURL(): void
@@ -181,7 +194,7 @@ final class Route
 
     private static function getConstants(): void
     {
-        $root = \dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, self::$level);
         require_once $root . '/config.php';
     }
 

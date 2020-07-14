@@ -4,9 +4,12 @@ namespace Lib\Autoload;
 
 final class AutoloadReal
 {
+
+    private static $level = 2;
+
     public static function bootstrap(): void
     {
-        $root = \dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, self::$level);
         if (file_exists($root . '/vendor/autoload.php')) {
             self::composerAutoload();
         } else {
@@ -16,7 +19,7 @@ final class AutoloadReal
 
     private static function composerAutoload(): void
     {
-        $root = \dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, self::$level);
         self::require($root . '/vendor/autoload.php');
     }
 
@@ -29,7 +32,7 @@ final class AutoloadReal
     {
         $namespace = \str_replace('\\', '/', $class);
         $finalClass = \str_replace('Lib', 'lib', $class);
-        $root = \dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, self::$level);
         self::require($root . '/' . $finalClass . '.php');
     }
 
