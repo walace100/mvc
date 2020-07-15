@@ -13,10 +13,6 @@ Route::get("/eae1", function(){
     echo "eae";
 });
 
-Route::get("/{a}", function(){
-    echo "fodase";
-});
-
 Route::post("/aff/{num}/{num2}", "Index", "index");
 
 Route::post("/oi/aff", "Home", "index");
@@ -26,8 +22,9 @@ Route::get("/eaemano", function(){
 });
 
 Route::get("/eaemano1/{1}/", function($val2, Request $val){
-    echo $val2 . PHP_EOL;
-    echo $val->a();
+    // echo $val2 . PHP_EOL;
+    // var_dump($val->get());
+    echo $val->get()->ae;
 });
 
 Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){
@@ -44,6 +41,10 @@ Route::get("get", function(){
 
 Route::post("get/{af}", function($af){
     echo $af;
+});
+
+Route::get("/{a}", function(){
+    echo "fodase";
 });
 
 Route::run();

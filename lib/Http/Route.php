@@ -125,7 +125,7 @@ final class Route
         ];
     }
 
-    private static function callController(array $route): void #  mexer no $param, ver a posição e colocar o Request, e ver as possibilidades
+    private static function callController(array $route): void
     {
         $param = [];
         if ($route['routesVal']['variable']) {
@@ -134,7 +134,7 @@ final class Route
         $closure = self::closureParams($route['action']);
         $closurePos = self::closurePos($closure);
         if (isset($closurePos)) {
-            self::arrayInsert($param, $closurePos, [new Request]);
+            self::arrayInsert($param, $closurePos, [new Request($route['method'])]);
 
         }
         if (!is_string($route['action'])) {
