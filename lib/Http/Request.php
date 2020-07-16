@@ -4,7 +4,6 @@ namespace Lib\Http;
 
 final class Request
 {
-
     private $method;
 
     public function __construct($method)
@@ -14,8 +13,8 @@ final class Request
 
     public function __call($nameMethod, $_ = null): ?object
     {
-        if ($nameMethod === $this->method) {
-            return eval('return $this->' . $this->method . '();');
+        if ($nameMethod === $this->method || $this->method === 'any') {
+            return eval('return $this->' . $nameMethod . '();');
         }
     }
 

@@ -7,7 +7,6 @@ use ReflectionFunction;
 
 final class Route
 {
-
     private static $level = 2;
 
     private static $url;
@@ -35,6 +34,11 @@ final class Route
     public static function post(string $route, $action, string $method = null): void
     {
         self::routes($route, 'POST', $action, $method);
+    }
+
+    public static function any(string $route, $action, string $method = null): void
+    {
+        self::routes($route, 'ANY', $action, $method);
     }
 
     private static function routes(string $route, string $method, $action, string $function = null): void
@@ -97,7 +101,7 @@ final class Route
         foreach (self::$routes as $route) {
             $arrRoutes = \explode('/', $route['route']);
             if ($route['route'] === self::$uri) {
-                if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
+                if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
                     return $route;
                 }
                 return [
@@ -111,7 +115,7 @@ final class Route
                     }
                 }
                 if ($count === \count(self::$arrURI)) {
-                    if ($route['method'] === $_SERVER['REQUEST_METHOD']) {
+                    if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
                         return $route;
                     } 
                     return [
@@ -131,8 +135,10 @@ final class Route
         if ($route['routesVal']['variable']) {
             $param = self::getParameters($route['routesVal']['keys']);
         }
-        $closure = self::closureParams($route['action']);
-        $closurePos = self::closurePos($closure);
+        if(!is_string($route['action'])){
+            $closure = self::closureParams($route['action']);
+            $closurePos = self::closurePos($closure);
+        }
         if (isset($closurePos)) {
             self::arrayInsert($param, $closurePos, [new Request($route['method'])]);
 
@@ -175,7 +181,7 @@ final class Route
     private static function closurePos(array $closurePos): ?int
     {
         foreach ($closurePos as $pos) {
-            if($pos){
+            if ($pos) {
                 return $pos['position'];
             }
         }
