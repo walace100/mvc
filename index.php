@@ -9,16 +9,28 @@ Route::get("/", function(){
     echo "fodase caralho";
 });
 
+Route::any("/branco", function(){});
+
 Route::any("/eae1", function(){
     echo "eae";
 });
 
-Route::post("/aff/{num}/{num2}", "Index", "index");
+Route::get("/eaemano", function(){
+    echo "<form action='eaemano1/1'><input type='text' name='ae'><br><button>enviar</button></form>";
+});
+
+Route::get("get", function(){
+    echo "<form method='post' action='get/aff'><input type='text' name='ae'><br><button>enviar</button></form>";
+});
 
 Route::any("/oi/aff", "Home", "index");
 
-Route::get("/eaemano", function(){
-    echo "<form action='eaemano1/1'><input type='text' name='ae'><br><button>enviar</button></form>";
+Route::get("/{afw}", function(){
+    echo "fodase caralho2";
+});
+
+Route::post("get/{af}", function($af){
+    echo $af;
 });
 
 Route::any("/eaemano1/{1}/", function($val2, Request $val){
@@ -27,24 +39,14 @@ Route::any("/eaemano1/{1}/", function($val2, Request $val){
     echo $val->get()->ae;
 });
 
-Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){
-    var_dump('<pre>' ,$a, $b, $c);
-});
+Route::any("/aff/{num}/{num2}", "Index", "index");
 
 Route::any("/{oi}/video/{aff}", function ($a, $b){
     echo "$a $b";
 });
 
-Route::get("get", function(){
-    echo "<form method='post' action='get/aff'><input type='text' name='ae'><br><button>enviar</button></form>";
-});
-
-Route::post("get/{af}", function($af){
-    echo $af;
-});
-
-Route::get("/{a}", function(){
-    echo "fodase";
+Route::get("/eae/{oi}/{eae}/fawf/{eawe}/", function($a, $b, $c){
+    var_dump('<pre>' ,$a, $b, $c);
 });
 
 Route::run();

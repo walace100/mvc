@@ -73,19 +73,46 @@ final class Route
             $routesVal = \preg_grep('/({)(?<={)\w+(})/', $arrRoute);
             $keys = \array_keys($routesVal);
             return [
+                'count' => \count($routesVal),
                 'variable' => true,
                 'keys' => $routesVal
             ];
         } else {
             return [
+                'count' => 0,
                 'variable' => false,
                 'routes' => []
             ];
         }
-    }  
+    }
+
+    private static function orderRoutes(): void #
+    {
+        $routes = self::$routes;
+        $maxNum = [0];
+        $routeFinal = [];
+        foreach ($routes as $route) {
+            if (!in_array($route['routesVal']['count'], $maxNum)) {
+                array_push($maxNum, $route['routesVal']['count']);
+            }
+        }
+        sort($maxNum);
+        foreach ($maxNum as $num) {
+            $routeFilters[] = array_filter($routes, function ($value) use ($num) {
+                return $value['routesVal']['count'] === $num;
+            });
+            foreach ($routeFilters as $routeFilter) {
+                foreach ($routeFilter as $route) {
+                    $routeFinal[] = $route;
+                }
+            }
+        }
+        self::$routes = $routeFinal;
+    }
 
     public static function run(): void
     {
+        self::orderRoutes();
         self::bootstrap();
         $route = self::verifyRoute();
         if (!isset($route['response'])) {
