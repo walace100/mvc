@@ -60,7 +60,7 @@ final class Route
             $route = \substr($route, 0, \strlen($route) -1);
         }
         if (!preg_match('/^\//', $route) && \strlen($route) > 1) {
-            $route = '/'. $route;
+            $route = '/' . $route;
         }
         return $route;
     }
@@ -86,7 +86,7 @@ final class Route
         }
     }
 
-    private static function orderRoutes(): void #
+    private static function orderRoutes(): void
     {
         $routes = self::$routes;
         $maxNum = [0];
@@ -96,7 +96,7 @@ final class Route
                 array_push($maxNum, $route['routesVal']['count']);
             }
         }
-        sort($maxNum);
+        \sort($maxNum);
         foreach ($maxNum as $num) {
             $routeFilters[] = array_filter($routes, function ($value) use ($num) {
                 return $value['routesVal']['count'] === $num;
@@ -125,15 +125,15 @@ final class Route
 
     private static function verifyRoute(): array
     {
+        $wrongmethod = false;
         foreach (self::$routes as $route) {
             $arrRoutes = \explode('/', $route['route']);
             if ($route['route'] === self::$uri) {
                 if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
                     return $route;
+                } else {
+                    $wrongmethod = true;
                 }
-                return [
-                    'response' => 405
-                ];
             } elseif ($route['routesVal']['variable'] && \count($arrRoutes) === \count(self::$arrURI)) {
                 $count = 0;
                 foreach (self::$arrURI as $key => $uri) {
@@ -144,16 +144,21 @@ final class Route
                 if ($count === \count(self::$arrURI)) {
                     if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
                         return $route;
-                    } 
-                    return [
-                        'response' => 405
-                    ];
+                    } else {
+                        $wrongmethod = true;
+                    }
                 }
             }
-        } 
-        return [
-            'response' => 404
-        ];
+        }
+        if ($wrongmethod) {
+            return [
+                'response' => 405
+            ];
+        } else {
+            return [
+                'response' => 404
+            ];
+        }
     }
 
     private static function callController(array $route): void
