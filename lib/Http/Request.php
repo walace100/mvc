@@ -6,6 +6,8 @@ final class Request
 {
     private $method;
 
+    private $has;
+
     public function __construct($method)
     {
         $this->method = \strtolower($method);
@@ -14,24 +16,38 @@ final class Request
     public function __call($nameMethod, $_ = null): ?object
     {
         if ($nameMethod === $this->method || $this->method === 'any') {
-            return eval('return $this->' . $nameMethod . '();');
+            return eval('return $this->$nameMethod();');
         }
     }
 
     private function get(): ?object
     {
         $get = (object) $_GET;
-        return $get;
+        return $this->verifyHas($get);
     }
 
     private function post(): ?object
     {
         $post = (object) $_POST;
-        return $post;
+        return $this->verifyHas($post);
     }
 
-    public function has(): object
+    public function has(string $has): object
     {
+        $this->has = $has;
         return $this;
+    }
+
+    private function verifyHas(object $class): ?object
+    {
+        if (!empty($this->has)) {
+            if (\property_exists($class, $this->has)) {
+                return $class;
+            } else {
+                eval('$class->' . $this->has . '= null;');
+                return $class;
+            }
+        }
+        return $class;
     }
 }

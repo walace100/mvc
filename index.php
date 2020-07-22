@@ -26,11 +26,11 @@ Route::get("get", function(){
 Route::any("/oi/aff", "Home", "index");
 
 Route::get("get1", function(){
-    echo "<form method='post'><input type='text' name='ae'><br><button>enviar</button></form>";
+    echo "<form action='get2'><input type='text' name='ae'><br><button>enviar</button></form>";
 });
 
-Route::post("get1", function(Request $re){
-    echo $re->post()->ae;
+Route::any("get2", function(Request $re){
+    var_dump($re->has('w')->post()->w);
 });
 
 Route::get("/{afw}", function(){
