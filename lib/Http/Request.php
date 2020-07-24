@@ -50,4 +50,9 @@ final class Request
         }
         return $class;
     }
+
+    public function redirect(string $url): void
+    {
+        \header('location: ' . $url);
+    }
 }

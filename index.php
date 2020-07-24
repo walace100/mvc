@@ -6,10 +6,12 @@ use Lib\Http\Route;
 use Lib\Http\Request;
 
 Route::get("/", function(){
-    echo "fodase caralho";
+    echo "fodase caralho3";
 });
 
-Route::any("/branco", function(){});
+Route::any("/branco", function(Request $req){
+    echo Route::string('/');
+});
 
 Route::any("/eae1", function(){
     echo "eae";

@@ -17,10 +17,13 @@ final class Route
 
     private static $arrURI;
 
+    private static $appBase;
+
     private static function bootstrap(): void
     {
         self::setURL();
         self::getConstants();
+        self::setAppBase();
         self::setURI();
         self::cleanURI();
         self::setArrURI();
@@ -230,6 +233,32 @@ final class Route
         self::$url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 
+    private static function setAppBase(): void
+    {
+        if (\preg_match('/(www)(\.?)/', APP_BASE)) {
+            $appBase = preg_split('/(www)(\.?)/', APP_BASE);
+            self::$appBase = preg_replace('/(\/$)/', '', array_pop($appBase));
+        } else {
+            self::$appBase = preg_replace('/(\/$)/', '', APP_BASE);
+        }
+    }
+
+    public static function string(string $route): string
+    {
+        if (preg_match('/(^\/)/', $route)) {
+            return $_SERVER['REQUEST_SCHEME'] . '://' . self::$appBase . $route;
+        } else {
+            $cleanRoute = '/' . $route;
+            return $_SERVER['REQUEST_SCHEME'] . '://' . self::$appBase . $cleanRoute;
+        }
+    }
+
+    public static function to(string $route): void
+    {
+        $url = self::string($route);
+        \header('location: ' . $url);
+    }
+
     private static function getConstants(): void
     {
         $root = \dirname(__DIR__, self::$level);
@@ -238,7 +267,8 @@ final class Route
 
     private static function setURI(): void
     {
-        $uri = \str_replace(APP_BASE, '', self::$url);
+        $appBase = preg_replace('/(\/$)/', '', self::$appBase);
+        $uri = \str_replace($appBase, '', self::$url);
         $uriFinal = \preg_replace('/\?.*/', '', $uri);
         self::$uri = $uriFinal;
     }
