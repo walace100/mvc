@@ -235,17 +235,17 @@ final class Route
 
     private static function setAppBase(): void
     {
-        if (\preg_match('/(www)(\.?)/', APP_BASE)) {
-            $appBase = preg_split('/(www)(\.?)/', APP_BASE);
-            self::$appBase = preg_replace('/(\/$)/', '', array_pop($appBase));
+        if (\preg_match('/www\.?/', APP_BASE)) {
+            $appBase = preg_split('/www\.?/', APP_BASE);
+            self::$appBase = preg_replace('/\/$/', '', array_pop($appBase));
         } else {
-            self::$appBase = preg_replace('/(\/$)/', '', APP_BASE);
+            self::$appBase = preg_replace('/\/$/', '', APP_BASE);
         }
     }
 
     public static function string(string $route): string
     {
-        if (preg_match('/(^\/)/', $route)) {
+        if (preg_match('/^\//', $route)) {
             return $_SERVER['REQUEST_SCHEME'] . '://' . self::$appBase . $route;
         } else {
             $cleanRoute = '/' . $route;
@@ -267,7 +267,7 @@ final class Route
 
     private static function setURI(): void
     {
-        $appBase = preg_replace('/(\/$)/', '', self::$appBase);
+        $appBase = preg_replace('/\/$/', '', self::$appBase);
         $uri = \str_replace($appBase, '', self::$url);
         $uriFinal = \preg_replace('/\?.*/', '', $uri);
         self::$uri = $uriFinal;

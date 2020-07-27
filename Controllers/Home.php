@@ -1,11 +1,13 @@
 <?php
 
 namespace Controllers;
+use Lib\Controllers\Controller;
 
-class Home
+class Home extends Controller
 {
     public function index()
     {
-        echo "oi";
+        $this->render("index");
+        // echo "oi";
     }
 }

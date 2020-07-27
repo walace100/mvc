@@ -1,8 +1,9 @@
 <?php
 
 namespace Controllers;
+use Lib\Controllers;
 
-class Index
+class Index extends Controller
 {
     public function index($eae, $af)
     {
