@@ -96,7 +96,7 @@ final class Route
         $routeFinal = [];
         foreach ($routes as $route) {
             if (!in_array($route['routesVal']['count'], $maxNum)) {
-                array_push($maxNum, $route['routesVal']['count']);
+                \array_push($maxNum, $route['routesVal']['count']);
             }
         }
         \sort($maxNum);
