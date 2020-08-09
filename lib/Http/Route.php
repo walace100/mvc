@@ -237,6 +237,7 @@ final class Route
     {
         if (\preg_match('/www\.?/', APP_BASE)) {
             $appBase = preg_split('/www\.?/', APP_BASE);
+            var_dump($appBase);
             self::$appBase = preg_replace('/\/$/', '', array_pop($appBase));
         } else {
             self::$appBase = preg_replace('/\/$/', '', APP_BASE);

@@ -7,7 +7,7 @@ class Home extends Controller
 {
     public function index()
     {
-        $this->render("index");
-        // echo "oi";
+        $this->render("index")->templete('templete', 'templete')->components(['components' => 'component']);
+        $this->assets(['js' => 'script'], ['css' => 'style']);
     }
 }
