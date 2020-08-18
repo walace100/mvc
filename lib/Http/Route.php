@@ -17,13 +17,10 @@ final class Route
 
     private static $arrURI;
 
-    private static $appBase;
-
     private static function bootstrap(): void
     {
         self::setURL();
         self::getConstants();
-        self::setAppBase();
         self::setURI();
         self::cleanURI();
         self::setArrURI();
@@ -223,34 +220,24 @@ final class Route
         return null;
     }
 
-    private static function arrayInsert(array &$array, int $position,  $insert): void
+    private static function arrayInsert(array &$array, int $position, $insert): void
     {
         array_splice($array, $position, 0, $insert);
     }
 
     private static function setURL(): void
     {
-        self::$url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-    }
-
-    private static function setAppBase(): void
-    {
-        if (\preg_match('/www\.?/', APP_BASE)) {
-            $appBase = preg_split('/www\.?/', APP_BASE);
-            var_dump($appBase);
-            self::$appBase = preg_replace('/\/$/', '', array_pop($appBase));
-        } else {
-            self::$appBase = preg_replace('/\/$/', '', APP_BASE);
-        }
+        $dominio = \preg_match('/^www\.?/', $_SERVER['HTTP_HOST']) ? \preg_split('/^www\.?/', $_SERVER['HTTP_HOST'])[1]: $_SERVER['HTTP_HOST'];
+        self::$url = $dominio . $_SERVER['REQUEST_URI'];
     }
 
     public static function string(string $route): string
     {
         if (preg_match('/^\//', $route)) {
-            return $_SERVER['REQUEST_SCHEME'] . '://' . self::$appBase . $route;
+            return $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $route;
         } else {
             $cleanRoute = '/' . $route;
-            return $_SERVER['REQUEST_SCHEME'] . '://' . self::$appBase . $cleanRoute;
+            return $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $cleanRoute;
         }
     }
 
@@ -262,14 +249,12 @@ final class Route
 
     private static function getConstants(): void
     {
-        $root = \dirname(__DIR__, self::$level);
-        require_once $root . '/config.php';
+        require_once ROOT . '/config.php';
     }
 
     private static function setURI(): void
     {
-        $appBase = preg_replace('/\/$/', '', self::$appBase);
-        $uri = \str_replace($appBase, '', self::$url);
+        $uri = \str_replace(APPBASE, '', self::$url);
         $uriFinal = \preg_replace('/\?.*/', '', $uri);
         self::$uri = $uriFinal;
     }

@@ -10,8 +10,6 @@ abstract class Controller
 
     private $levels;
 
-    private $root;
-
     private $view;
 
     private $viewParam;
@@ -33,12 +31,11 @@ abstract class Controller
         $this->componentPath = 'components/';
         $this->assetsPath = 'assets/';
         $this->levels = 2;
-        $this->getRoot();
     }
 
     public function render(string $view, array $parameters = []): object
     {
-        $this->view = \file_get_contents($this->root . $this->viewPath . $view . '.php');
+        $this->view = \file_get_contents(ROOT . $this->viewPath . $view . '.php'); 
         $this->viewParam = $parameters;
         return $this;
     }
@@ -46,8 +43,7 @@ abstract class Controller
     private function runRender(): void
     {
         extract($this->viewParam);
-        $rawView = $this->view;
-        $view = \preg_replace('/(?(?=({{.*[\w]+.*}})){{|\0)/', '<?php ', $rawView);
+        $view = \preg_replace('/(?(?=({{.*[\w]+.*}})){{|\0)/', '<?php ', $this->view);
         $middleView = \preg_replace('/(?(?=({.*[\w]+.*})){|\0)/', '<?= ', $view);
         $semiView = \preg_grep('/(<\?php|<\?=).*[\w]+.*}}/', compact('middleView'));
         $finalView = \array_reduce($semiView, function($acc, $value){
@@ -68,11 +64,11 @@ abstract class Controller
         if (empty($this->templete) || empty($this->contentNameTemplete))
             return;
 
-        $templete = \file_get_contents($this->root . $this->viewPath . $this->templetePath . $this->templete . '.php');
+        $templete = \file_get_contents(ROOT . $this->viewPath . $this->templetePath . $this->templete . '.php');
         $this->view = \preg_replace('/(?(?=({{\s?' . $this->contentNameTemplete . '\s?}})){{\s?' . $this->contentNameTemplete . '\s?}}|\0)/', $this->view, $templete);
     }
 
-    public function assets(array $js, array $css): object
+    public function assets(array $css, array $js = []): object
     {
         $this->jsAssets = $js;
         $this->cssAssets = $css;
@@ -84,20 +80,20 @@ abstract class Controller
         if (empty($this->jsAssets) || empty($this->cssAssets))
             return;
         
-        $assets = [$this->jsAssets, $this->cssAssets];
+        $assets = [$this->cssAssets, $this->jsAssets];
         foreach ($assets as $keyAssets => $asset) {
             $content = '';
             foreach ($asset as $key => $value) {
-                $path = $_SERVER['REQUEST_SCHEME'] . '://' . APP_BASE . $this->viewPath . $this->assetsPath . ( $keyAssets === 0 ? 'js/': 'css/') . $value;
+                $path = $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $this->viewPath . $this->assetsPath . ( $keyAssets === 0 ? 'css/': 'js/') . $value;
                 $path = str_replace('\\', '/', $path);
                 $name = $value;
                 if (\is_string($key))
                     $name = $key;
     
                 if ($keyAssets === 0) {
-                    $content .= '<script src="' . $path . '.js"></script>';
-                } else {
                     $content .= '<link rel="stylesheet" href="' . $path . '.css">';
+                } else {
+                    $content .= '<script src="' . $path . '.js"></script>';
                 }
                 $this->view = \preg_replace('/(?(?=({{\s?' . $name . '\s?}})){{\s?' . $name . '\s?}}|\0)/', $content, $this->view);
             }
@@ -120,7 +116,7 @@ abstract class Controller
             if (\is_string($key))
                 $name = $key;
 
-            $content = \file_get_contents($this->root . $this->viewPath . $this->componentPath . $component . '.php');
+            $content = \file_get_contents(ROOT . $this->viewPath . $this->componentPath . $component . '.php');
             $this->view = \preg_replace('/(?(?=({{\s?' . $name . '\s?}})){{\s?' . $name . '\s?}}|\0)/', $content, $this->view);
         }
     }
@@ -131,11 +127,6 @@ abstract class Controller
         $this->runAssets();
         $this->runComponents();
         $this->runRender();
-    }
-
-    private function getRoot(): void
-    {
-        $this->root = \dirname(__DIR__, $this->levels);
     }
 
     public function __destruct()
