@@ -1,2 +1,2 @@
 # mvc
-Projeto feito em PHP feito no design parttern MVC
+Projeto feito em PHP feito no design pattern MVC
