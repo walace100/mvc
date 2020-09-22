@@ -1,9 +1,15 @@
 <?php
 
+require_once 'config.php';
+require_once 'lib/Support/constants.php';
 require_once 'lib/autoload.php';
 
+use Lib\Http\CreateRoute;
 use Lib\Http\Route;
 use Lib\Http\Request;
+
+CreateRoute::get('/{a}', 'a');
+CreateRoute::run();
 
 Route::get("/", function(){
     echo "fodase caralho";

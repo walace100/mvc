@@ -1,7 +1,8 @@
 <?php
 
 namespace Controllers;
-use Lib\Controllers;
+
+use Lib\Controllers\Controller;
 
 class Index extends Controller
 {

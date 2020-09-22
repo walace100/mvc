@@ -7,8 +7,6 @@ use ReflectionFunction;
 
 final class Route
 {
-    private static $level = 2;
-
     private static $url;
 
     private static $uri;
@@ -71,7 +69,7 @@ final class Route
         $isVal = \preg_match_all('/({)(?<={)\w+(})/', $route);
         if ($isVal) {
             $routesVal = \preg_grep('/({)(?<={)\w+(})/', $arrRoute);
-            $keys = \array_keys($routesVal);
+            // $keys = \array_keys($routesVal);
             return [
                 'count' => \count($routesVal),
                 'variable' => true,

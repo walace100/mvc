@@ -42,6 +42,9 @@ abstract class Controller
 
     private function runRender(): void
     {
+        if (is_null($this->view) || is_null($this->viewParam))
+            return;
+
         extract($this->viewParam);
         $view = \preg_replace('/(?(?=({{.*[\w]+.*}})){{|\0)/', '<?php ', $this->view);
         $middleView = \preg_replace('/(?(?=({.*[\w]+.*})){|\0)/', '<?= ', $view);

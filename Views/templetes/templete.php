@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{css}}
-    <title>eae</title>
-</head>
-<body>
-    <h1>dawdw</h1>
-    {{components}}
-    {{templete}}
-    {{js}}
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {{css}}
+        <title>eae</title>
+    </head>
+    <body>
+        <h1>dawdw</h1>
+        {{components}}
+        {{templete}}
+        {{js}}
+    </body>
 </html>
