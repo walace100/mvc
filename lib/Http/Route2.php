@@ -18,6 +18,8 @@ final class Route2
 
     public $parameters;
 
+    public $arrRoutes;
+
     public function __construct(string $route, string $method, $action, string $function = null)
     {
         $this->rawRoute = $route;
@@ -26,9 +28,10 @@ final class Route2
         $this->function = $function;
         $this->route = $this->cleanRoute($route);
         $this->parameters = $this->parameters($route);
+        $this->arrRoutes = $this->arrRoutes($this->route);
     }
 
-    private function cleanRoute($route): string
+    private function cleanRoute(string $route): string
     {
         if (\preg_match('/\/$/', $route) && \strlen($route) > 1) {
             $route = \substr($route, 0, \strlen($route) -1);
@@ -60,5 +63,10 @@ final class Route2
         } else {
             return $response;
         }
+    }
+
+    private function arrRoutes(string $routes): array
+    {
+        return \explode('/', $routes);
     }
 }

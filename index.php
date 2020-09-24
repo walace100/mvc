@@ -9,6 +9,7 @@ use Lib\Http\Route;
 use Lib\Http\Request;
 
 CreateRoute::get('/{a}', 'a');
+CreateRoute::get('eae/{a}', 'a');
 CreateRoute::run();
 
 Route::get("/", function(){

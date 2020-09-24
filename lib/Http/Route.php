@@ -79,7 +79,7 @@ final class Route
             return [
                 'count' => 0,
                 'variable' => false,
-                'routes' => []
+                'keys' => []
             ];
         }
     }
@@ -225,7 +225,7 @@ final class Route
 
     private static function setURL(): void
     {
-        $dominio = \preg_match('/^www\.?/', $_SERVER['HTTP_HOST']) ? \preg_split('/^www\.?/', $_SERVER['HTTP_HOST'])[1]: $_SERVER['HTTP_HOST'];
+        $dominio = \preg_split('/^www\./', $_SERVER['HTTP_HOST'])[1] ?? $_SERVER['HTTP_HOST'];
         self::$url = $dominio . $_SERVER['REQUEST_URI'];
     }
 
