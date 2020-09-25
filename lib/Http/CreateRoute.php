@@ -40,6 +40,12 @@ final class CreateRoute
         }
     }
 
+    public static function to(string $route): void
+    {
+        $url = self::string($route);
+        \header('location: ' . $url);
+    }
+
     public static function run(): void
     {
         new ControllerRoute(self::$routes);

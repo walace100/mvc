@@ -18,9 +18,11 @@ final class CallController
     private function index(Route $route): void
     {
         $param = [];
+
         if ($route->parameters->variable) {
-            $param = $this->getParameters($route->parameters->routes, $this->arrURI);
+            $param = $this->getParameters($route, $this->arrURI);
         } 
+
         if ($route->closure) {
             $closure = $this->positionParameters($route->action);
             if (!is_null($closure)) {
@@ -30,17 +32,21 @@ final class CallController
         $this->callController($route, $param);
     }
 
-    private function getParameters(array $parameters, array $arrURI): array
+    private function getParameters(Route $route, array $arrURI): array
     {
         $param = [];
-        $keys = \array_keys($parameters);
 
-        foreach ($keys as $value) {
-           if (\preg_match('/(?<![\w+])([1-9]+)$/', $arrURI[$value])) {
-                \array_push($param, (int) $arrURI[$value]);
-           } else {
-                \array_push($param, $arrURI[$value]);
-           }
+        foreach ($route->arrRoutes as $key => $value) {
+            
+            if (\preg_match('/({)(?<={)\w+(})/', $value)) {
+
+                if (\preg_match('/(?<![\w+])([1-9]+)$/', $arrURI[$key])) {           
+                    \array_push($param, (int) $arrURI[$key]);
+                } else {
+                    \array_push($param, $arrURI[$key]);
+                }
+                
+            }
         }
         return $param;
     }
