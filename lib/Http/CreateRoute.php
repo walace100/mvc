@@ -30,6 +30,16 @@ final class CreateRoute
         array_push(self::$routes, $routeClass);
     }
 
+    public static function string(string $route): string
+    {
+        if (preg_match('/^\//', $route)) {
+            return $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $route;
+        } else {
+            $cleanRoute = '/' . $route;
+            return $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $cleanRoute;
+        }
+    }
+
     public static function run(): void
     {
         new ControllerRoute(self::$routes);

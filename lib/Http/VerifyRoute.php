@@ -33,7 +33,6 @@ final class VerifyRoute
         foreach ($routes as $route) {
 
             if ($route->route === $this->URI) {
-
                 if ($route->method === $_SERVER['REQUEST_METHOD'] || $route->method === 'ANY') {
                     $this->code = 200;
                     return $route;
@@ -82,13 +81,17 @@ final class VerifyRoute
             }
         }
         \sort($maxNum);
-        
+
         foreach ($maxNum as $num) {
             $routeFilters = array_filter($routes, function ($value) use ($num) {
                 return $value->parameters->count === $num;
             });
+
+            foreach ($routeFilters as $routeFilter) {
+                $routeFinal[] = $routeFilter;
+            }
         }
-        return $routeFilters;
+        return $routeFinal;
     }
 
     private function setURL(): string
