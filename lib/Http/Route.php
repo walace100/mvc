@@ -171,8 +171,8 @@ final class Route
         }
         if (isset($closurePos)) {
             self::arrayInsert($param, $closurePos, [new Request($route['method'])]);
-
         }
+
         if (!is_string($route['action'])) {
             \call_user_func($route['action'], ...$param);
         } elseif ($route['function']) {

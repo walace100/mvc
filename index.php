@@ -4,20 +4,15 @@ require_once 'config.php';
 require_once 'lib/Support/constants.php';
 require_once 'lib/autoload.php';
 
-use Lib\Http\CreateRoute;
-use Lib\Http\Route;
+use Lib\Http\CreateRoute as Route;
 use Lib\Http\Request;
-
-CreateRoute::get('/{a}', 'a');
-CreateRoute::get('eae/{a}', 'a');
-CreateRoute::run();
 
 Route::get("/", function(){
     echo "fodase caralho";
 });
 
 Route::any("/branco", function(Request $req){
-    echo Route::string('/');
+    // echo Route::string('/');
 });
 
 Route::any("/eae1", function(){
@@ -42,7 +37,7 @@ Route::any("get2", function(Request $re){
     var_dump($re->has('w')->post()->w);
 });
 
-Route::get("/{afw}", function(){
+Route::get("/{afw}", function($a){
     echo "fodase caralho2";
 });
 
@@ -53,7 +48,7 @@ Route::post("get/{af}", function($af){
 Route::any("/eaemano1/{1}/", function($val2, Request $val){
     // echo $val2 . PHP_EOL;
     // var_dump($val->get());
-    echo $val->get()->ae;
+    echo $val->has('ae')->get()->ae;
 });
 
 Route::any("/aff/{num}/{num2}", "Index", "index");

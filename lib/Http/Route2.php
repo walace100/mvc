@@ -8,8 +8,6 @@ final class Route2
 {
     public $route;
 
-    public $rawRoute;
-
     public $method;
 
     public $action;
@@ -20,15 +18,17 @@ final class Route2
 
     public $arrRoutes;
 
+    public $closure;
+
     public function __construct(string $route, string $method, $action, string $function = null)
     {
-        $this->rawRoute = $route;
         $this->method = $method;
         $this->action = $action;
         $this->function = $function;
         $this->route = $this->cleanRoute($route);
         $this->parameters = $this->parameters($route);
         $this->arrRoutes = $this->arrRoutes($this->route);
+        $this->closure = $this->isClosure($action);
     }
 
     private function cleanRoute(string $route): string
@@ -63,6 +63,11 @@ final class Route2
         } else {
             return $response;
         }
+    }
+
+    private function isClosure($closure): bool
+    {
+        return !\is_string($closure);
     }
 
     private function arrRoutes(string $routes): array

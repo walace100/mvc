@@ -10,7 +10,7 @@ final class VerifyRoute
 
     private $URI;
 
-    private $arrURI;
+    public $arrURI;
 
     public $code;
 
@@ -26,7 +26,7 @@ final class VerifyRoute
         $this->callRoute = $this->verifyRoute($this->routes);
     }
 
-    private function verifyRoute(array $routes): ?Route2 #
+    private function verifyRoute(array $routes): ?Route2 # ###
     {
         $wrongmethod = false;
 
@@ -66,11 +66,10 @@ final class VerifyRoute
 
         if ($wrongmethod) {
             $this->code = 405;
-            return null;
         } else {
             $this->code = 404;
-            return null;
         }
+        return null;
     }
 
     private function orderRoutes(array $routes): array
