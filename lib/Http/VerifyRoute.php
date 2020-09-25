@@ -26,7 +26,7 @@ final class VerifyRoute
         $this->callRoute = $this->verifyRoute($this->routes);
     }
 
-    private function verifyRoute(array $routes): ?Route2 # ###
+    private function verifyRoute(array $routes): ?Route
     {
         $wrongmethod = false;
 

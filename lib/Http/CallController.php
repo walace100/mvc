@@ -9,13 +9,13 @@ final class CallController
 {
     private $arrURI;
 
-    public function __construct(Route2 $route, array $arrURI)#
+    public function __construct(Route $route, array $arrURI)
     {
         $this->arrURI = $arrURI;
         $this->index($route);
     }
 
-    private function index(Route2 $route): void #
+    private function index(Route $route): void
     {
         $param = [];
         if ($route->parameters->variable) {
@@ -58,7 +58,7 @@ final class CallController
         return null;
     }
 
-    private function callController(Route2 $route, array $parameters): void
+    private function callController(Route $route, array $parameters): void
     {
         if ($route->closure) {
             \call_user_func($route->action, ...$parameters);
