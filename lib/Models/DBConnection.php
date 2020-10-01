@@ -12,9 +12,10 @@ abstract class DBConnection extends PDO
     public function __construct()
     {
         $this->connection = $this->connection();
+        $this->charset();
     }
 
-    private function connection()
+    private function connection(): PDO
     {
         $dsn = 'mysql:host=' . DBHOST . ';dbname=' . DBNAME . ';charset=' . DBCHARSET;
         $user = DBUSER;
@@ -22,9 +23,20 @@ abstract class DBConnection extends PDO
 
         try {
             $connection = new PDO($dsn, $user, $password);
+            var_dump($connection);
             return $connection;
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
+    }
+
+    private function charset(): void
+    {
+        $sql = "
+            SET NAMES '" . DBCHARSET ."';
+            SET CHARACTER_SET_CONNECTION = '" . DBCHARSET ."';
+            SET CHARACTER_SET_RESULTS = '" . DBCHARSET ."'
+        ";
+        $statement = $this->connection->query($sql);
     }
 }

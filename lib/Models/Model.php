@@ -2,64 +2,73 @@
 
 namespace Lib\Models;
 
+use Exception;
 use Lib\Models\DBConnection;
-use LimitIterator;
 use PDO;
 use PDOStatement;
+use PDOException;
 
 abstract class Model extends DBConnection
 {
     protected $table = null;
     
-    public function query(string $query, $arguments = []): PDOStatement #
+    public function querySt(string $query, $arguments = []): PDOStatement
     {
         parent::__construct();
-        $statement = $this->connection->prepare($query);
-        $this->setParam($statement, $arguments);
-        $statement->execute();
-        return $statement;
+        try {
+            $statement = $this->connection->prepare($query);
+            $this->setValue($statement, $arguments);
+            $statement->execute();
+            return $statement;
+        } catch (PDOException | Exception $e) {
+            echo $e;
+        }
     }
 
-    public function insert(array $attributes, array $values, string $table = null): void
+    public function insert(array $attributes, array $values, ?string $table = null): void
     {
         [$fields, $table] = $this->setFields($attributes, $table);
         $protectedValues = implode(',', array_fill(0, count($values), '?'));
 
         $sql = "INSERT INTO $table ($fields) VALUES ($protectedValues)";
-        $this->query($sql, $values);
+        $this->querySt($sql, $values);
     }
 
-    public function find(string $attribute, string $value, array $fields = null, string $table = null): array
+    public function find(string $attribute, string $value, ?array $fields = null, ?string $table = null): array
     {
         [$newfields, $table] = $this->setFields($fields, $table);
 
         $sql = "SELECT $newfields FROM $table WHERE $attribute = ?";
-        $statement = $this->query($sql, $value);
+        $statement = $this->querySt($sql, $value);
         return $statement->fetchAll(PDO::FETCH_CLASS);
     }
 
-    public function all(array $attributes = null, string $table = null, int $limit = 1000000): array
+    public function all(?array $attributes = null, ?string $table = null, int $limit = 1000000): array
     {
         [$attribute, $table] = $this->setFields($attributes, $table);
 
         $sql = "SELECT $attribute FROM $table LIMIT $limit";
-        $statement = $this->query($sql);
+        $statement = $this->querySt($sql);
         return $statement->fetchAll(PDO::FETCH_CLASS);
     }
 
-    // public function update(array $newValueAssoc, array $compareValueAssoc, int $limit = 1): void
-    // {
-        
-    // }
+    public function update(array $setValueAssoc, array $compareValueAssoc, ?string $table = null, int $limit = 1): void
+    {
+        [, $table] = $this->setFields(null, $table);
+        [$set, $where] = $this->setCompareFields([$setValueAssoc, $compareValueAssoc]);
+        $values = [...array_values($setValueAssoc), ...array_values($compareValueAssoc)];
+        $sql = "UPDATE $table SET $set WHERE $where";
+        $this->querySt($sql, $values);
+    }
 
-    public function delete(string $attribute, $value, string $table = null, int $limit = 1): void
+    public function delete(string $attribute, $value, ?string $table = null, int $limit = 1): void
     {
         $table = $table ?? $this->table;
         $sql = "DELETE FROM $table WHERE $attribute = ? LIMIT $limit";
-        $this->query($sql, $value);
+        $this->querySt($sql, $value);
     }
 
-    private function setParam(PDOStatement $statement, $arguments): void
+    private function setValue(PDOStatement $statement, $arguments): void
     {
         if (!is_array($arguments)) {
             $statement->bindValue(1, $arguments);
@@ -77,10 +86,21 @@ abstract class Model extends DBConnection
         }
     }
 
-    private function setFields($attributes, $table = null): array
+    private function setFields($attributes, ?string $table = null): array
     {
         $fields = $attributes ? implode(',', $attributes): '*';
         $table = $table ?? $this->table;
         return [$fields, $table];
+    }
+
+    private function setCompareFields(array $fields): array
+    {
+        foreach ($fields as $key => $field) {
+            foreach (array_keys($field) as $value) {
+                $setfields[$key][] = $value . ' = ?';
+                $finalFields[$key] = implode(', ', $setfields[$key]);
+            }
+        }
+        return $finalFields;
     }
 }

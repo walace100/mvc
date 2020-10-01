@@ -13,7 +13,7 @@ final class Request
         $this->method = \strtolower($method);
     }
 
-    public function __call($nameMethod, $_ = null): ?object
+    public function __call(string $nameMethod, $_ = null): ?object
     {
         if ($nameMethod === $this->method || $this->method === 'any') {
             return eval('return $this->$nameMethod();');
