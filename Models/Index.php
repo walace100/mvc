@@ -10,8 +10,10 @@ class Index extends Model
     public function __construct()
     {
         $this->table = 'teste';
-        var_dump($this->all());
-        $a = $this->query('SELECT * FROM teste;')->fetchAll(PDO::FETCH_CLASS);
-        var_dump($a[0]->id);
+        // $query = $this->insert(['id', 'nome', 'idade'], [$id, $nome, $idade]);
+        // $query = $this->query("SELECT * FROM teste WHERE id = :id", [':id' => '1']);
+        $query = $this->update(['id' =>'5'], []);
+        // var_dump('<pre>',$query->fetchAll(PDO::FETCH_CLASS));
+
     }
 }

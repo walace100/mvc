@@ -12,7 +12,6 @@ Route::get("/", function(){
 });
 
 Route::get("branco", function(){
-    var_dump(empty([]));
 });
 
 Route::get("get", function(){
