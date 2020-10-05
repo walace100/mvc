@@ -7,7 +7,7 @@ use PDO;
 
 class Index extends Model
 {
-    public function __construct()
+    public function index()
     {
         $this->table = 'teste';
         // $query = $this->insert(['id', 'nome', 'idade'], [$id, $nome, $idade]);

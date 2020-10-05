@@ -7,7 +7,7 @@ use PDOException;
 
 abstract class DBConnection extends PDO
 {
-    protected $connection;
+    protected $connection = false;
 
     public function __construct()
     {
@@ -15,7 +15,7 @@ abstract class DBConnection extends PDO
         $this->charset();
     }
 
-    private function connection(): PDO
+    public function connection(): PDO
     {
         $dsn = 'mysql:host=' . DBHOST . ';dbname=' . DBNAME . ';charset=' . DBCHARSET;
         $user = DBUSER;
@@ -37,6 +37,6 @@ abstract class DBConnection extends PDO
             SET CHARACTER_SET_CONNECTION = '" . DBCHARSET ."';
             SET CHARACTER_SET_RESULTS = '" . DBCHARSET ."'
         ";
-        $statement = $this->connection->query($sql);
+        $this->connection->query($sql);
     }
 }

@@ -4,9 +4,9 @@ namespace Lib\Controllers;
 
 abstract class Controller
 {
-    private $viewPath;
+    private $viewPath = '/Views/';
 
-    private $templetePath;
+    private $templetePath = '/templetes/';
 
     private $view;
 
@@ -22,14 +22,11 @@ abstract class Controller
 
     private $components;
 
-    public function __construct()
-    {
-        $this->viewPath = '/Views/';
-        $this->templetePath = '/templetes/';
-        $this->componentPath = 'components/';
-        $this->assetsPath = 'assets/';
-        $this->levels = 2;
-    }
+    private $assetsPath = 'assets/';
+
+    private $componentPath = 'components/';
+
+    private $init = false;
 
     public function render(string $view, array $parameters = []): object
     {
@@ -132,8 +129,14 @@ abstract class Controller
         }
     }
 
-    public function __destruct()
+    public function run(): void
     {
+        if (!$this->init) {
+            $this->init = true;
+        } else {
+            return;
+        }
+
         $this->runTemplete();
         $this->runAssets();
         $this->runComponents();

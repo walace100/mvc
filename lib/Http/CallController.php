@@ -70,8 +70,10 @@ final class CallController
             \call_user_func($route->action, ...$parameters);
         } elseif ($route->function) {
             $class = '\Controllers\\' . $route->action;
+            $instance = new $class();
             $method = $route->function;
-            (new $class)->$method(...$parameters);
+            $instance->$method(...$parameters);
+            $instance->run(true);
         }
     }
 } 

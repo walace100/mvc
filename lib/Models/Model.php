@@ -10,8 +10,8 @@ use PDOException;
 
 abstract class Model extends DBConnection
 {
-    protected $table = null;
-    
+    public $table = null;
+
     public function querySt(string $query, $arguments = []): PDOStatement
     {
         parent::__construct();
