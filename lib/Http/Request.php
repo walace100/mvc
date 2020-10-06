@@ -2,6 +2,8 @@
 
 namespace Lib\Http;
 
+use Lib\Http\Session;
+
 final class Request
 {
     private $method;
@@ -17,7 +19,10 @@ final class Request
     {
         if ($nameMethod === $this->method || $this->method === 'any') {
             return eval('return $this->$nameMethod();');
+        } else if ($nameMethod === 'session') {
+            return $this->session();
         }
+        return null;
     }
 
     private function get(): ?object
@@ -32,23 +37,29 @@ final class Request
         return $this->verifyHas($post);
     }
 
+    private function session(): Session
+    {
+        $session = new Session();
+        return $session;
+    }
+
     public function has(string $has): object
     {
         $this->has = $has;
         return $this;
     }
 
-    private function verifyHas(object $class): ?object
+    private function verifyHas(object $object): ?object
     {
         if (!empty($this->has)) {
-            if (\property_exists($class, $this->has)) {
-                return $class;
+            if (\property_exists($object, $this->has)) {
+                return $object;
             } else {
                 eval('$class->' . $this->has . '= null;');
-                return $class;
+                return $object;
             }
         }
-        return $class;
+        return $object;
     }
 
     public function redirect(string $url): void

@@ -7,7 +7,9 @@ Route::get("/", function(){
     echo "/";
 });
 
-Route::get("branco", function(){
+Route::get("branco", function(Request $request){
+    $request->session()->oi = 'daw';
+    var_dump('<pre>', $request->session()->all());
 });
 
 Route::get("get", function(){
