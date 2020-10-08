@@ -23,7 +23,6 @@ abstract class DBConnection extends PDO
 
         try {
             $connection = new PDO($dsn, $user, $password);
-            var_dump($connection);
             return $connection;
         } catch (PDOException $e) {
             echo $e->getMessage();

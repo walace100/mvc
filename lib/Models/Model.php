@@ -54,9 +54,13 @@ abstract class Model extends DBConnection
 
     public function update(array $setValueAssoc, array $compareValueAssoc, ?string $table = null, int $limit = 1): void
     {
+        $logicAND = count($compareValueAssoc) > 1 ? true: false;
+        $logicPos = $logicAND ? 1: null;
+
         [, $table] = $this->setFields(null, $table);
-        [$set, $where] = $this->setCompareFields([$setValueAssoc, $compareValueAssoc]);
+        [$set, $where] = $this->setCompareFields([$setValueAssoc, $compareValueAssoc], $logicAND, $logicPos);
         $values = [...array_values($setValueAssoc), ...array_values($compareValueAssoc)];
+
         $sql = "UPDATE $table SET $set WHERE $where";
         $this->querySt($sql, $values);
     }
@@ -93,12 +97,17 @@ abstract class Model extends DBConnection
         return [$fields, $table];
     }
 
-    private function setCompareFields(array $fields): array
+    private function setCompareFields(array $fields, bool $logicAND, ?int $logicPos): array
     {
         foreach ($fields as $key => $field) {
             foreach (array_keys($field) as $value) {
                 $setfields[$key][] = $value . ' = ?';
-                $finalFields[$key] = implode(', ', $setfields[$key]);
+
+                if (!is_null($logicPos) && $logicAND) {
+                    $finalFields[$key] = implode(' AND ', $setfields[$key]);
+                } else {
+                    $finalFields[$key] = implode(', ', $setfields[$key]);
+                }
             }
         }
         return $finalFields;

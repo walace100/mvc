@@ -77,7 +77,7 @@ abstract class Controller
 
     private function runAssets(): void
     {
-        if (empty($this->jsAssets) || empty($this->cssAssets))
+        if (empty($this->jsAssets) && empty($this->cssAssets))
             return;
         
         $assets = [$this->cssAssets, $this->jsAssets];
