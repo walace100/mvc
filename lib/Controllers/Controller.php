@@ -2,11 +2,13 @@
 
 namespace Lib\Controllers;
 
+use Lib\Support\Arr;
+
 abstract class Controller
 {
-    private $viewPath = '/Views/';
+    protected $viewPath = '/Views/';
 
-    private $templetePath = '/templetes/';
+    protected $templetePath = '/templetes/';
 
     private $view;
 
@@ -22,34 +24,47 @@ abstract class Controller
 
     private $components;
 
-    private $assetsPath = 'assets/';
+    protected $assetsPath = 'assets/';
 
-    private $componentPath = 'components/';
+    protected $componentPath = 'components/';
 
     private $init = false;
 
-    public function render(string $view, array $parameters = []): object
+    public function render(string $view, ?array ...$parameters): object
     {
-        $this->view = \file_get_contents(ROOT . $this->viewPath . $view . '.php'); 
+        $this->view = \file_get_contents(ROOT . $this->viewPath . $view . '.php');
         $this->viewParam = $parameters;
         return $this;
     }
 
     private function runRender(): void
     {
-        if (empty($this->view) || is_null($this->viewParam))
+        if (empty($this->view) || is_null($this->viewParam)) {
             return;
+        }
 
-        extract($this->viewParam);
+        foreach ($this->viewParam as $param) {
+            if (Arr::isAssoc($param)) {
+                extract($param);
+            } else {
+                return;
+            }
+        }
 
-        $view = \preg_replace('/(?(?=({{.*[\w]+.*}})){{|\0)/', '<?php ', $this->view);
-        $middleView = \preg_replace('/(?(?=({.*[\w]+.*})){|\0)/', '<?= ', $view);
-        $semiView = \preg_grep('/(<\?php|<\?=).*[\w]+.*}}/', compact('middleView'));
-        $finalView = \array_reduce($semiView, function($acc, $value){
-            return \preg_replace('/}}?/', '?>', $value);
-        });
+        $view = \preg_replace('/(?(?=(@@.*[\w]+.*@@))@@|\0)/', '<?php ', $this->view);
+        $middleView = \preg_replace('/(?(?=(@.*[\w]+.*@))@|\0)/', '<?= ', $view);   
+        $semiView = \preg_grep('/(<\?php|<\?=).*[\w]+.*@@?/', compact('middleView'));
+       
+        if (count($semiView) > 0) {
 
-        eval('?>' . $finalView);
+            $finalView = array_map(function($value){
+                return \preg_replace('/@@?/', ' ?>', $value);
+            }, $semiView);
+
+            eval('?>' . $finalView['middleView']);
+        } else {
+            eval('?>' . $middleView);
+        }
     }
 
     public function templete(string $templete, string $alias): object
@@ -141,5 +156,10 @@ abstract class Controller
         $this->runAssets();
         $this->runComponents();
         $this->runRender();
+    }
+
+    public function __destruct()
+    {
+        $this->run();
     }
 }

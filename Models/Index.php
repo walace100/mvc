@@ -18,6 +18,6 @@ class Index extends Model
         // $query = $this->query("SELECT * FROM teste WHERE id = :id", [':id' => '1']);
         // $this->update(['nome' => 'teste'], ['id' => '4', 'nome' => 'Douglas']);
         $query = $this->all();
-        var_dump('<pre>',$query);
+        // var_dump('<pre>',$query);
     }
 }
