@@ -3,13 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {{css}}
+        @@css@@
         <title>eae</title>
     </head>
     <body>
         <h1>dawdw</h1>
-        {{components}}
-        {{templete}}
-        {{js}}
+        @@components@@
+        @@templete@@
+        @@js@@
     </body>
 </html>

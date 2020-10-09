@@ -39,14 +39,14 @@ abstract class Controller
 
     private function runRender(): void
     {
-        if (empty($this->view) || is_null($this->viewParam)) {
+        if (empty($this->view) && is_null($this->viewParam)) {
             return;
         }
 
         foreach ($this->viewParam as $param) {
-            if (Arr::isAssoc($param)) {
+            if (!is_null($param) && Arr::isAssoc($param)) {
                 extract($param);
-            } else {
+            } elseif (!is_null($param)) {
                 return;
             }
         }
@@ -63,8 +63,14 @@ abstract class Controller
 
             eval('?>' . $finalView['middleView']);
         } else {
+
             eval('?>' . $middleView);
         }
+    }
+
+    private function replacer($itemPattern, $replacement, $subject): string
+    {
+        return \preg_replace('/(?(?=(@@\s?' . $itemPattern . '\s?@@))@@\s?' . $itemPattern . '\s?@@|\0)/', $replacement, $subject);
     }
 
     public function templete(string $templete, string $alias): object
@@ -80,7 +86,7 @@ abstract class Controller
             return;
 
         $templete = \file_get_contents(ROOT . $this->viewPath . $this->templetePath . $this->templete . '.php');
-        $this->view = \preg_replace('/(?(?=({{\s?' . $this->aliasTemplete . '\s?}})){{\s?' . $this->aliasTemplete . '\s?}}|\0)/', $this->view, $templete);
+        $this->view = $this->replacer($this->aliasTemplete, $this->view, $templete);
     }
 
     public function assets(array $css, array $js = []): object
@@ -92,9 +98,10 @@ abstract class Controller
 
     private function runAssets(): void
     {
-        if (empty($this->jsAssets) && empty($this->cssAssets))
+        if (empty($this->jsAssets) && empty($this->cssAssets)) {
             return;
-        
+        }
+
         $assets = [$this->cssAssets, $this->jsAssets];
 
         foreach ($assets as $keyAssets => $asset) {
@@ -104,10 +111,11 @@ abstract class Controller
 
                 $path = $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $this->viewPath . $this->assetsPath . ( $keyAssets === 0 ? 'css/': 'js/') . $value;
                 $path = str_replace('\\', '/', $path);
-                $name = $value;
 
                 if (\is_string($key)) {
                     $name = $key;
+                } else {
+                    $name = $value;
                 }
     
                 if ($keyAssets === 0) {
@@ -116,7 +124,7 @@ abstract class Controller
                     $content .= '<script src="' . $path . '.js"></script>';
                 }
 
-                $this->view = \preg_replace('/(?(?=({{\s?' . $name . '\s?}})){{\s?' . $name . '\s?}}|\0)/', $content, $this->view);
+                $this->view = $this->replacer($name, $content, $this->view);
             }
         }
     }
@@ -129,18 +137,20 @@ abstract class Controller
 
     private function runComponents(): void
     {
-        if (empty($this->components))
+        if (empty($this->components)) {
             return;
+        }
 
         foreach ($this->components as $key => $component) {
-            $name = $component;
 
             if (\is_string($key)) {
                 $name = $key;
+            } else {
+                $name = $component;
             }
 
             $content = \file_get_contents(ROOT . $this->viewPath . $this->componentPath . $component . '.php');
-            $this->view = \preg_replace('/(?(?=({{\s?' . $name . '\s?}})){{\s?' . $name . '\s?}}|\0)/', $content, $this->view);
+            $this->view = $this->replacer($name, $content, $this->view);
         }
     }
 

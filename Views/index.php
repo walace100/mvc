@@ -1,1 +1,3 @@
-{ $oi; }
+@ '$oi;'; @
+@@ components @@
+@@js2@@
