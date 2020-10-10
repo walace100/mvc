@@ -14,8 +14,9 @@ class Index extends Controller
     public function index($eae, $af)
     {
         try {
-            throw new GeralException('a');
+            throw new GeralException('aa');
         } catch(GeralException $e) {
+            // var_dump($e);
         }
         new ModelsIndex();
     }

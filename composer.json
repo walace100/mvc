@@ -15,7 +15,8 @@
         "psr-4": {
             "Lib\\": "lib/",
             "Controllers\\": "Controllers/",
-            "Models\\": "Models/"
+            "Models\\": "Models/",
+            "Exceptions\\": "Exceptions/"
         }
     }
 }

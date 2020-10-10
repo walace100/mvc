@@ -1,6 +1,6 @@
 <?php
 
-namespace Lib\Exceptions;
+namespace Lib\Exceptions\Controllers;
 
 use Lib\Controllers\Controller;
 
