@@ -26,6 +26,10 @@ abstract class Controller
 
     protected $assetsPath = 'assets/';
 
+    protected $cssPath = 'css/';
+
+    protected $jsPath = 'js/';
+
     protected $componentPath = 'components/';
 
     private $init = false;
@@ -74,7 +78,7 @@ abstract class Controller
         return \preg_replace('/(?(?=(@@\s?' . $itemPattern . '\s?@@))@@\s?' . $itemPattern . '\s?@@|\0)/', $replacement, $subject);
     }
 
-    public function templete(string $templete, string $alias): object
+    public function templete(string $alias, string $templete): object
     {
         $this->templete = $templete;
         $this->aliasTemplete = $alias;
@@ -110,7 +114,19 @@ abstract class Controller
 
             foreach ($asset as $key => $value) {
 
-                $path = $_SERVER['REQUEST_SCHEME'] . '://' . APPBASE . $this->viewPath . $this->assetsPath . ( $keyAssets === 0 ? 'css/': 'js/') . $value;
+                if ($keyAssets === 0) {
+                    $link = $this->cssPath;
+                } else {
+                    $link = $this->jsPath;
+                }
+
+                if (empty($link) || is_null($link)) {
+                    $path = [APPBASE, $this->viewPath, $this->assetsPath, $value];
+                } else {
+                    $path = [APPBASE, $this->viewPath, $this->assetsPath, $value];
+                }
+
+                $path = $_SERVER['REQUEST_SCHEME'] . '://' . implode('/', $path); 
                 $path = str_replace('\\', '/', $path);
 
                 if (\is_string($key)) {
@@ -164,10 +180,10 @@ abstract class Controller
     private function cleanFolders()
     {
         $queue = [&$this->viewPath, &$this->templetePath, &$this->componentPath, &$this->assetsPath];
-
-        foreach ($queue as $value) {
+        foreach ($queue as $key => $value) {
             $value = preg_replace('/^\//', '', $value);
-            $value = preg_replace('/\/^/', '', $value);
+            $value = preg_replace('/\/$/', '', $value);
+            $queue[$key] = $value;
         }
     }
 

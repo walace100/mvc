@@ -4,7 +4,7 @@ namespace Lib\Exceptions\Controllers;
 
 use Lib\Controllers\Controller;
 
-class ExceptionController extends Controller
+class RouteController extends Controller
 {
     private $view;
 
@@ -24,6 +24,6 @@ class ExceptionController extends Controller
         $this->render($this->view, $this->param)
         ->assets(['css' => 'style'])
         ->templete('view', 'templete')
-        ->components(['title' => 'geralExceptionTitle']);
+        ->components(['title' => 'routeExceptionTitle']);
     }
 }

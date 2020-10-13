@@ -19,7 +19,7 @@ final class Request
     {
         if ($nameMethod === $this->method || $this->method === 'any') {
             return eval('return $this->$nameMethod();');
-        } else if ($nameMethod === 'session') {
+        } elseif ($nameMethod === 'session') {
             return $this->session();
         }
         return null;

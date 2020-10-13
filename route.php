@@ -12,6 +12,8 @@ Route::get("branco", function(Request $request){
     var_dump('<pre>', $request->session()->all());
 });
 
+Route::get("branco1", 2);
+
 Route::get("get", function(){
     echo "get";
 });

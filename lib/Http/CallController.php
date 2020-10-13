@@ -4,6 +4,7 @@ namespace Lib\Http;
 
 use Lib\Http\Request;
 use ReflectionFunction;
+use Lib\Exceptions\RouteException;
 
 final class CallController
 {
@@ -66,14 +67,18 @@ final class CallController
 
     private function callController(Route $route, array $parameters): void
     {
-        if ($route->closure) {
-            \call_user_func($route->action, ...$parameters);
-        } elseif ($route->function) {
-            $class = '\Controllers\\' . $route->action;
-            $instance = new $class();
-            $method = $route->function;
-            $instance->$method(...$parameters);
-            $instance->run();
+        try {
+            if ($route->closure) {
+                \call_user_func($route->action, ...$parameters);
+            } elseif ($route->function) {
+                $class = '\Controllers\\' . $route->action;
+                $instance = new $class();
+                $method = $route->function;
+                $instance->$method(...$parameters);
+                $instance->run();
+            }
+        } catch (\Exception $e) {
+            throw new RouteException('Classe ou função não existe');
         }
     }
 } 

@@ -1,5 +1,5 @@
 <div class="table">
-<h1>GeralException</h1>
+<h1>Route Exception</h1>
     <table>
         <tr>
             <th> Mensagem

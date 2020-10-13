@@ -41,7 +41,7 @@ final class Session
         return session_encode();
     }
 
-    public function decode($data): bool
+    public function decode(string $data): bool
     {
         $this->start();
         return session_decode($data);

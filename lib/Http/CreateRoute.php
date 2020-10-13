@@ -4,6 +4,7 @@ namespace Lib\Http;
 
 use Lib\Http\ControllerRoute;
 use Lib\Http\Route;
+use Lib\Exceptions\RouteException;
 
 final class CreateRoute
 {
@@ -11,16 +12,28 @@ final class CreateRoute
 
     public static function get(string $route, $action, string $method = null): void
     {
+        if (gettype($action) !== 'string' && gettype($action) !== 'object') {
+            throw new RouteException('Argumento passado: $action não é string ou object');
+        }
+
         self::routes($route, 'GET', $action, $method);
     }
 
     public static function post(string $route, $action, string $method = null): void
     {
+        if (gettype($action) !== 'string' && gettype($action) !== 'object') {
+            throw new RouteException('Argumento passado: $action não é string ou object');
+        }
+
         self::routes($route, 'POST', $action, $method);
     }
 
     public static function any(string $route, $action, string $method = null): void
     {
+        if (gettype($action) !== 'string' && gettype($action) !== 'object') {
+            throw new RouteException('Argumento passado: $action não é string ou object');
+        }
+
         self::routes($route, 'ANY', $action, $method);
     }
 
