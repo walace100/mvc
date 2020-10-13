@@ -23,7 +23,7 @@ final class ControllerRoute
             new CallController($verify->callRoute, $verify->arrURI);
         } else {
             header('HTTP/1.1 ' . $verify->code);
-            echo $verify->code;
+            echo '<h1>' . $verify->code . '</h1>';
         }
     }
 }

@@ -73,7 +73,7 @@ final class CallController
             $instance = new $class();
             $method = $route->function;
             $instance->$method(...$parameters);
-            $instance->run(true);
+            $instance->run();
         }
     }
 } 

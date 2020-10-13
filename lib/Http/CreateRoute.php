@@ -26,7 +26,7 @@ final class CreateRoute
 
     private static function routes(string $route, string $method, $action, string $function = null): void
     {
-        $routeClass = new Route($route, $method, $action, $function); #
+        $routeClass = new Route($route, $method, $action, $function);
         array_push(self::$routes, $routeClass);
     }
 

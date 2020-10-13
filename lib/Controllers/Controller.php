@@ -32,7 +32,8 @@ abstract class Controller
 
     public function render(string $view, ?array ...$parameters): object
     {
-        $this->view = \file_get_contents(ROOT . $this->viewPath . $view . '.php');
+        $this->cleanFolders();
+        $this->view = $this->getContents([$this->viewPath, $view]);
         $this->viewParam = $parameters;
         return $this;
     }
@@ -85,7 +86,7 @@ abstract class Controller
         if (empty($this->templete) || empty($this->aliasTemplete))
             return;
 
-        $templete = \file_get_contents(ROOT . $this->viewPath . $this->templetePath . $this->templete . '.php');
+        $templete = $this->getContents([$this->viewPath, $this->templetePath, $this->templete]);
         $this->view = $this->replacer($this->aliasTemplete, $this->view, $templete);
     }
 
@@ -149,8 +150,24 @@ abstract class Controller
                 $name = $component;
             }
 
-            $content = \file_get_contents(ROOT . $this->viewPath . $this->componentPath . $component . '.php');
+            $content = $this->getContents([$this->viewPath, $this->componentPath, $component]);
             $this->view = $this->replacer($name, $content, $this->view);
+        }
+    }
+
+    private function getContents(array $path): string
+    {
+        $itens = implode('/', $path);
+        return \file_get_contents(ROOT . '/' . $itens . '.php');
+    }
+
+    private function cleanFolders()
+    {
+        $queue = [&$this->viewPath, &$this->templetePath, &$this->componentPath, &$this->assetsPath];
+
+        foreach ($queue as $value) {
+            $value = preg_replace('/^\//', '', $value);
+            $value = preg_replace('/\/^/', '', $value);
         }
     }
 

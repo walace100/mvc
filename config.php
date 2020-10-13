@@ -1,6 +1,6 @@
 <?php
 
-define('APP_BASE', 'www.localhost/mvc/');
+define('APP_BASE', '/mvc');
 
 define('DBHOST', 'localhost');
 define('DBNAME', 'teste');
