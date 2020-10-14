@@ -78,7 +78,7 @@ final class CallController
                 $instance->run();
             }
         } catch (\Exception $e) {
-            throw new RouteException('Classe ou função não existe');
+            throw new RouteException('Ocorreu um erro: ' . $e->getMessage());
         }
     }
 } 

@@ -3,12 +3,13 @@
 namespace Lib\Controllers;
 
 use Lib\Support\Arr;
+use Lib\Exceptions\ControllerException;
 
 abstract class Controller
 {
-    protected $viewPath = '/Views/';
+    protected $viewPath = 'Views';
 
-    protected $templetePath = '/templetes/';
+    protected $templetePath = 'templetes';
 
     private $view;
 
@@ -24,13 +25,13 @@ abstract class Controller
 
     private $components;
 
-    protected $assetsPath = 'assets/';
+    protected $assetsPath = 'assets';
 
-    protected $cssPath = 'css/';
+    protected $cssPath = 'css';
 
-    protected $jsPath = 'js/';
+    protected $jsPath = 'js';
 
-    protected $componentPath = 'components/';
+    protected $componentPath = 'components';
 
     private $init = false;
 
@@ -52,7 +53,7 @@ abstract class Controller
             if (!is_null($param) && Arr::isAssoc($param)) {
                 extract($param);
             } elseif (!is_null($param)) {
-                return;
+                throw new ControllerException('parâmetros passados não são array associativo');
             }
         }
 
@@ -66,10 +67,15 @@ abstract class Controller
                 return \preg_replace('/@@?/', ' ?>', $value);
             }, $semiView);
 
-            eval('?>' . $finalView['middleView']);
+            $response = $finalView['middleView'];
         } else {
+            $response = $middleView;
+        }
 
-            eval('?>' . $middleView);
+        try {
+            eval('?>' . $response);
+        } catch (\Exception $e) {
+            throw new ControllerException('ocorreu um erro: ' . $e->getMessage());
         }
     }
 
@@ -87,8 +93,11 @@ abstract class Controller
 
     private function runTemplete(): void
     {
-        if (empty($this->templete) || empty($this->aliasTemplete))
+        if (empty($this->templete) || empty($this->aliasTemplete)){
             return;
+        } elseif (empty($this->view)) {
+            throw new ControllerException('a view não pode ficar vazia');
+        }
 
         $templete = $this->getContents([$this->viewPath, $this->templetePath, $this->templete]);
         $this->view = $this->replacer($this->aliasTemplete, $this->view, $templete);
@@ -105,43 +114,39 @@ abstract class Controller
     {
         if (empty($this->jsAssets) && empty($this->cssAssets)) {
             return;
+        } elseif (empty($this->view)) {
+            throw new ControllerException('a view não pode ficar vazia');
         }
 
         $assets = [$this->cssAssets, $this->jsAssets];
 
+        if (!Arr::every($assets, 'Lib\Support\Arr::isAssoc')) {
+            throw new ControllerException('parâmetros passados não são array associativo');
+        }
+
         foreach ($assets as $keyAssets => $asset) {
-            $content = '';
 
             foreach ($asset as $key => $value) {
 
-                if ($keyAssets === 0) {
-                    $link = $this->cssPath;
-                } else {
-                    $link = $this->jsPath;
-                }
+                $content = '';
+                $link = $keyAssets === 0 ? $this->cssPath: $this->jsPath;
 
                 if (empty($link) || is_null($link)) {
                     $path = [APPBASE, $this->viewPath, $this->assetsPath, $value];
                 } else {
-                    $path = [APPBASE, $this->viewPath, $this->assetsPath, $value];
+                    $path = [APPBASE, $this->viewPath, $this->assetsPath, $link, $value];
                 }
 
                 $path = $_SERVER['REQUEST_SCHEME'] . '://' . implode('/', $path); 
                 $path = str_replace('\\', '/', $path);
 
-                if (\is_string($key)) {
-                    $name = $key;
-                } else {
-                    $name = $value;
-                }
-    
                 if ($keyAssets === 0) {
                     $content .= '<link rel="stylesheet" href="' . $path . '.css">';
                 } else {
                     $content .= '<script src="' . $path . '.js"></script>';
                 }
 
-                $this->view = $this->replacer($name, $content, $this->view);
+                $this->view = $this->replacer($key, $content, $this->view);
             }
         }
     }
@@ -156,30 +161,42 @@ abstract class Controller
     {
         if (empty($this->components)) {
             return;
+        } elseif (empty($this->view)) {
+            throw new ControllerException('a view não pode ficar vazia');
+        }
+
+        if (!Arr::isAssoc($this->components)) {
+            throw new ControllerException('parâmetros passados não são array associativo');
         }
 
         foreach ($this->components as $key => $component) {
-
-            if (\is_string($key)) {
-                $name = $key;
-            } else {
-                $name = $component;
-            }
-
             $content = $this->getContents([$this->viewPath, $this->componentPath, $component]);
-            $this->view = $this->replacer($name, $content, $this->view);
+            $this->view = $this->replacer($key, $content, $this->view);
         }
     }
 
     private function getContents(array $path): string
     {
         $itens = implode('/', $path);
-        return \file_get_contents(ROOT . '/' . $itens . '.php');
+
+        try {
+            return \file_get_contents(ROOT . '/' . $itens . '.php');
+        } catch (\Exception $e) {
+            throw new ControllerException('ocorreu um erro: ' . $e->getMessage());
+        }
     }
 
-    private function cleanFolders()
+    private function cleanFolders(): void
     {
-        $queue = [&$this->viewPath, &$this->templetePath, &$this->componentPath, &$this->assetsPath];
+        $queue = [
+            &$this->viewPath,
+            &$this->templetePath,
+            &$this->componentPath,
+            &$this->assetsPath,
+            &$this->cssPath,
+            &$this->jsPath,
+        ];
+
         foreach ($queue as $key => $value) {
             $value = preg_replace('/^\//', '', $value);
             $value = preg_replace('/\/$/', '', $value);
