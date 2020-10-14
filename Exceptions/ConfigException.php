@@ -8,5 +8,6 @@ final class ConfigException
         \Lib\Exceptions\GeralException::class,
         \Lib\Exceptions\RouteException::class,
         \Lib\Exceptions\ControllerException::class,
+        \Lib\Exceptions\ModelController::class,
     ];
 }

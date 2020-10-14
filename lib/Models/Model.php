@@ -2,7 +2,7 @@
 
 namespace Lib\Models;
 
-use Exception;
+use Lib\Exceptions\modelException;
 use Lib\Models\DBConnection;
 use PDO;
 use PDOStatement;
@@ -15,13 +15,14 @@ abstract class Model extends DBConnection
     public function querySt(string $query, $arguments = []): PDOStatement
     {
         parent::__construct();
+
         try {
             $statement = $this->connection->prepare($query);
             $this->setValue($statement, $arguments);
             $statement->execute();
             return $statement;
-        } catch (PDOException | Exception $e) {
-            echo $e;
+        } catch (PDOException $e) {
+            throw new ModelException('ocorreu um erro: ' . $e->getMessage());
         }
     }
 
@@ -74,19 +75,23 @@ abstract class Model extends DBConnection
 
     private function setValue(PDOStatement $statement, $arguments): void
     {
-        if (!is_array($arguments)) {
-            $statement->bindValue(1, $arguments);
-            return;
-        }
-
-        foreach ($arguments as $key => $arg) {
-
-            if (\is_string($key)) {
-                $statement->bindValue($key, $arg);
-            } else {
-                $statement->bindValue($key + 1, $arg);
+        try {
+            if (!is_array($arguments)) {
+                $statement->bindValue(1, $arguments);
+                return;
             }
-
+    
+            foreach ($arguments as $key => $arg) {
+    
+                if (\is_string($key)) {
+                    $statement->bindValue($key, $arg);
+                } else {
+                    $statement->bindValue($key + 1, $arg);
+                }
+    
+            }
+        } catch (PDOException $e) {
+            throw new ModelException('ocorreu um erro: ' . $e->getMessage());
         }
     }
 

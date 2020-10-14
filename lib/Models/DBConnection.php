@@ -4,6 +4,7 @@ namespace Lib\Models;
 
 use PDO;
 use PDOException;
+use Lib\Exceptions\ModelException;
 
 abstract class DBConnection extends PDO
 {
@@ -25,7 +26,7 @@ abstract class DBConnection extends PDO
             $connection = new PDO($dsn, $user, $password);
             return $connection;
         } catch (PDOException $e) {
-            echo $e->getMessage();
+            throw new ModelException('ocorreu um erro: ' . $e->getMessage());
         }
     }
 
@@ -36,6 +37,11 @@ abstract class DBConnection extends PDO
             SET CHARACTER_SET_CONNECTION = '" . DBCHARSET ."';
             SET CHARACTER_SET_RESULTS = '" . DBCHARSET ."'
         ";
-        $this->connection->query($sql);
+
+        try {
+            $this->connection->query($sql);
+        } catch (PDOException $e) {
+            throw new ModelException('ocorreu um erro: ' . $e->getMessage());
+        }
     }
 }
