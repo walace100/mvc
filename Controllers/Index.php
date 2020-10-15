@@ -11,13 +11,9 @@ class Index extends Controller
     public function __construct()
     {
     }
-    public function index($eae, $af)
+    public function index()
     {
-        try {
-            throw new GeralException('aa');
-        } catch(GeralException $e) {
-            // var_dump($e);
-        }
-        new ModelsIndex();
+     
+       new ModelsIndex();
     }
 }

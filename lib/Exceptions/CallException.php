@@ -6,6 +6,12 @@ use Exceptions\ConfigException;
 
 final class CallException
 {
+    /**
+     * Instancia os Controllers das Exceptions
+     * 
+     * @param  mixed  $exception
+     * @return void
+     */
     public function renderView($exception): void
     {
         $params = [

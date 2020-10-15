@@ -6,10 +6,36 @@ use Lib\Controllers\Controller;
 
 class ExceptionController extends Controller
 {
+    /**
+     * Armazena a view.
+     * 
+     * @var string
+     */
     private $view;
 
+    /**
+     * Armazena os parâmetros da Exception
+     * 
+     * @var array
+     */
     private $param;
 
+
+    /**
+     * Define o caminho da view.
+     * 
+     * Define o caminho do CSS.
+     * 
+     * Define a view.
+     * 
+     * Define os parâmetros da Exception.
+     * 
+     * Chama o método init.
+     * 
+     * @param  string  $view
+     * @param  array  $param
+     * @return void
+     */
     public function __construct(string $view, array $param)
     {
         $this->viewPath = '/lib/Exceptions/views/';
@@ -19,7 +45,12 @@ class ExceptionController extends Controller
         $this->init();
     }
 
-    private function init()
+    /**
+     * Define a view, assets, templete e componentes e o inicia.
+     * 
+     * @return void
+     */
+    private function init(): void
     {
         $this->render($this->view, $this->param)
         ->assets(['css' => 'style'])

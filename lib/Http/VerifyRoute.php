@@ -4,18 +4,62 @@ namespace Lib\Http;
 
 final class VerifyRoute
 {
+    /**
+     * Armazena as Rotas.
+     * 
+     * @var array
+     */
     private $routes;
 
+    /**
+     * Armazena a URL.
+     * 
+     * @var string
+     */
     private $URL;
 
+    /**
+     * Armazena a URI.
+     * 
+     * @var string
+     */
     private $URI;
 
+    /**
+     * Armazena a URI em formato de array.
+     * 
+     * @var array
+     */
     public $arrURI;
 
+    /**
+     * Armazena o código HTTP.
+     * 
+     * @var int
+     */
     public $code;
 
+    /**
+     * Armazena a rota a ser chamada.
+     * 
+     * @var \Lib\Http\Route|null
+     */
     public $callRoute;
 
+    /**
+     * Inicia a ordenação de rotas.
+     * 
+     * Define a URL.
+     * 
+     * limpa a URI.
+     * 
+     * Define a URI em array.
+     * 
+     * Define a rota certa a ser chamada.
+     * 
+     * @param  array  $routes
+     * @return void
+     */
     public function __construct(array $routes)
     {
         $this->routes = $this->orderRoutes($routes);
@@ -26,6 +70,12 @@ final class VerifyRoute
         $this->callRoute = $this->verifyRoute($this->routes);
     }
 
+    /**
+     * Verifica a rota certa com base na URI.
+     * 
+     * @param  array  $routes
+     * @return \Lib\Http\Route|null
+     */
     private function verifyRoute(array $routes): ?Route
     {
         $wrongmethod = false;
@@ -71,6 +121,12 @@ final class VerifyRoute
         return null;
     }
 
+    /**
+     * Ordena as rotas com base nos parâmetros.
+     * 
+     * @param  array  $routes
+     * @return array
+     */
     private function orderRoutes(array $routes): array
     {
         $maxNum = [0];
@@ -94,12 +150,23 @@ final class VerifyRoute
         return $routeFinal;
     }
 
+    /**
+     * Retorna a URL.
+     * 
+     * @return string
+     */
     private function setURL(): string
     {
         $dominio = \preg_split('/^www\./', $_SERVER['HTTP_HOST'])[1] ?? $_SERVER['HTTP_HOST'];
         return $dominio . $_SERVER['REQUEST_URI'];
     }
 
+    /**
+     * Define a URI.
+     * 
+     * @param  string  $url
+     * @return array
+     */
     private function setURI(string $url): string
     {
         $uri = \str_replace(APPBASE, '', $url);
@@ -107,6 +174,12 @@ final class VerifyRoute
         return $uriFinal;
     }
 
+    /**
+     * Limpa as rotas tirando a / do final das rotas.
+     * 
+     * @param  string  $uri
+     * @return string
+     */
     private function cleanURI(string $uri): string
     {
         if (\preg_match('/\/$/', $uri) && \strlen($uri) > 1) {
@@ -115,6 +188,12 @@ final class VerifyRoute
         return $uri;
     }
 
+    /**
+     * Define a URI em array dividos por /.
+     * 
+     * @param  string  $uri
+     * @return array
+     */
     private function setArrURI(string $uri): array
     {
         return \explode('/', $uri);

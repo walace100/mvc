@@ -7,15 +7,36 @@ use Lib\Models\DBConnection;
 use PDO;
 use PDOStatement;
 use PDOException;
+use Lib\Support\Arr;
 
 abstract class Model extends DBConnection
 {
+    /**
+     * Armazena o valor da tabela.
+     * 
+     * @var string|null
+     */
     public $table = null;
 
+    /**
+     * Controla como a próxima linha será retornada ao chamador.
+     * 
+     * @var int
+     */
+    protected $fetch_style = PDO::FETCH_CLASS;
+
+    /**
+     * Executa uma query e retorna um statement.
+     * 
+     * @param  string  $query
+     * @param  mixed  $arguments
+     * @return \PDOStatement
+     * 
+     * @throws \Lib\Models\ModelException
+     */
     public function querySt(string $query, $arguments = []): PDOStatement
     {
         parent::__construct();
-
         try {
             $statement = $this->connection->prepare($query);
             $this->setValue($statement, $arguments);
@@ -26,6 +47,14 @@ abstract class Model extends DBConnection
         }
     }
 
+    /**
+     * Insere valores no banco de dados.
+     * 
+     * @param  array  $attributes
+     * @param  array  $values
+     * @param  string|null  $table
+     * @return void
+     */
     public function insert(array $attributes, array $values, ?string $table = null): void
     {
         [$fields, $table] = $this->setFields($attributes, $table);
@@ -35,26 +64,58 @@ abstract class Model extends DBConnection
         $this->querySt($sql, $values);
     }
 
+    /**
+     * Encontra um registro no banco de dados.
+     * 
+     * @param  string  $attribute
+     * @param  string  $value
+     * @param  array|null  $fields
+     * @param  string|null  $table
+     * @return array
+     */
     public function find(string $attribute, string $value, ?array $fields = null, ?string $table = null): array
     {
         [$newfields, $table] = $this->setFields($fields, $table);
 
         $sql = "SELECT $newfields FROM $table WHERE $attribute = ?";
         $statement = $this->querySt($sql, $value);
-        return $statement->fetchAll(PDO::FETCH_CLASS);
+        return $statement->fetchAll($this->fetch_style);
     }
 
+    /**
+     * Encontra todos os registros no banco de dados.
+     * 
+     * @param  array|null  $attributes
+     * @param  string|null  $table
+     * @param  int|null  $limit
+     * @return array
+     */
     public function all(?array $attributes = null, ?string $table = null, int $limit = 1000000): array
     {
         [$attribute, $table] = $this->setFields($attributes, $table);
 
         $sql = "SELECT $attribute FROM $table LIMIT $limit";
         $statement = $this->querySt($sql);
-        return $statement->fetchAll(PDO::FETCH_CLASS);
+        return $statement->fetchAll($this->fetch_style);
     }
 
+    /**
+     * Atualiza um registro do banco de dados.
+     * 
+     * @param  array  $setValueAssoc
+     * @param  array  $compareValueAssoc
+     * @param  string|null  $table
+     * @param  int|null  $limit
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ModelException
+     */
     public function update(array $setValueAssoc, array $compareValueAssoc, ?string $table = null, int $limit = 1): void
     {
+        if (!Arr::isAssoc($setValueAssoc) || !Arr::isAssoc($compareValueAssoc)) {
+            throw new ModelException('parâmetros passados não são array associativo');
+        }
+
         $logicAND = count($compareValueAssoc) > 1 ? true: false;
         $logicPos = $logicAND ? 1: null;
 
@@ -66,6 +127,15 @@ abstract class Model extends DBConnection
         $this->querySt($sql, $values);
     }
 
+    /**
+     * Atualiza um registro do banco de dados.
+     * 
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  string|null  $table
+     * @param  int|null  $limit
+     * @return void
+     */
     public function delete(string $attribute, $value, ?string $table = null, int $limit = 1): void
     {
         $table = $table ?? $this->table;
@@ -73,6 +143,15 @@ abstract class Model extends DBConnection
         $this->querySt($sql, $value);
     }
 
+    /**
+     * Blinda os parâmetros antes de entrar no banco de dados.
+     * 
+     * @param  \PDOStatement  $statement
+     * @param  mixed  $arguments
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ModelException
+     */
     private function setValue(PDOStatement $statement, $arguments): void
     {
         try {
@@ -95,6 +174,15 @@ abstract class Model extends DBConnection
         }
     }
 
+    /**
+     * Se existir, junta os valores por vírgula, senão retorna *.
+     * Retorna a tabela da classe se $table não for definido.
+     * 
+     * @param  mixed  $attributes
+     * @param  string|null  $table
+     * 
+     * @return array
+     */
     private function setFields($attributes, ?string $table = null): array
     {
         $fields = $attributes ? implode(',', $attributes): '*';
@@ -102,7 +190,15 @@ abstract class Model extends DBConnection
         return [$fields, $table];
     }
 
-    private function setCompareFields(array $fields, bool $logicAND, ?int $logicPos): array
+    /**
+     * Compara os valores e junta por vírgula, se tiver o $logicAND juntará por AND
+     * @param  array  $fields
+     * @param  bool  $logicAND
+     * @param  int|null  $logicPos
+     * 
+     * @return array
+     */
+    private function setCompareFields(array $fields, bool $logicAND = false, ?int $logicPos): array
     {
         foreach ($fields as $key => $field) {
             foreach (array_keys($field) as $value) {

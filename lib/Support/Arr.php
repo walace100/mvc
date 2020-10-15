@@ -6,6 +6,14 @@ use Lib\Exceptions\GeralException;
 
 class Arr
 {
+    /**
+     * Verifica se o array é um array associativo.
+     * 
+     * @param  array  $array
+     * @return bool
+     * 
+     * @throws \Lib\Exceptions\GeralException
+     */
     public static function isAssoc(array $array): bool
     {
         try {
@@ -15,6 +23,15 @@ class Arr
         }
     }
 
+    /**
+     * Verifica se todos os valores retornarem true, senão returna false
+     * 
+     * @param  array $array
+     * @param  mixed $callback
+     * @return bool
+     * 
+     * @throws \Lib\Exceptions\GeralException
+     */
     public static function every(array $array, $callback): bool
     {
         try {

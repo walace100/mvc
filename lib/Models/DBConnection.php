@@ -8,14 +8,32 @@ use Lib\Exceptions\ModelException;
 
 abstract class DBConnection extends PDO
 {
+    /**
+     * Armazena a conexão com o banco de dados, é recomendado iniciar o parent::connection()
+     * antes de usar.
+     * 
+     * @var \PDO|bool
+     */
     protected $connection = false;
 
+    /**
+     * Inicia a conexão e define o charset.
+     * 
+     * @return void
+     */
     public function __construct()
     {
         $this->connection = $this->connection();
         $this->charset();
     }
 
+    /**
+     * Inicia a conexão com o banco de dados.
+     * 
+     * @return \PDO
+     * 
+     * @throws \Lib\Exceptions\ModelException
+     */
     public function connection(): PDO
     {
         $dsn = 'mysql:host=' . DBHOST . ';dbname=' . DBNAME . ';charset=' . DBCHARSET;
@@ -30,6 +48,13 @@ abstract class DBConnection extends PDO
         }
     }
 
+    /**
+     * Define o charset de nome, conexão e resultado do banco de dados.
+     * 
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ModelException
+     */
     private function charset(): void
     {
         $sql = "

@@ -7,34 +7,115 @@ use Lib\Exceptions\ControllerException;
 
 abstract class Controller
 {
+    /**
+     * Armazena o caminho da view.
+     * 
+     * @var string
+     */
     protected $viewPath = 'Views';
 
+    /**
+     * Armazena o caminho do templete.
+     * 
+     * @var string
+     */
     protected $templetePath = 'templetes';
 
+    /**
+     * Armazena o conteudo da view.
+     * 
+     * @var string
+     */
     private $view;
 
+    /**
+     * Armazena os parâmetros da view.
+     * 
+     * @var array
+     */
     private $viewParam;
 
+    /**
+     * Armazena o conteudo do templete.
+     * 
+     * @var string
+     */
     private $templete;
 
+    /**
+     * Armazena o apelido do templete.
+     * 
+     * @var string
+     */
     private $aliasTemplete;
 
+    /**
+     * Armazena o apelido e o nome do arquivo do javascript.
+     * 
+     * @var array
+     */
     private $jsAssets;
 
+    /**
+     * Armazena o apelido e o nome do arquivo do CSS.
+     * 
+     * @var array
+     */
     private $cssAssets;
 
+    /**
+     * Armazena o apelido e o nome do arquivo dos componentes.
+     * 
+     * @var array
+     */
     private $components;
 
+    /**
+     * Armazena o caminho dos assets.
+     * 
+     * @var string
+     */
     protected $assetsPath = 'assets';
 
+    /**
+     * Armazena o caminho do CSS.
+     * 
+     * @var string
+     */
     protected $cssPath = 'css';
 
+    /**
+     * Armazena o caminho do javascript.
+     * 
+     * @var string
+     */
     protected $jsPath = 'js';
 
+    /**
+     * Armazena o caminho dos componentes.
+     * 
+     * @var string
+     */
     protected $componentPath = 'components';
 
+    /**
+     * Armazena o valor se o método run já foi iniciado.
+     * 
+     * @var bool
+     */
     private $init = false;
 
+    /**
+     * Limpa os nomes da pastas.
+     * 
+     * Pega o conteúdo da view.
+     * 
+     * Define os parâmetros da view.
+     * 
+     * @param  string  $view
+     * @param  array|null $parameters
+     * @return this
+     */
     public function render(string $view, ?array ...$parameters): object
     {
         $this->cleanFolders();
@@ -43,6 +124,13 @@ abstract class Controller
         return $this;
     }
 
+    /**
+     * Renderiza a view.
+     * 
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ControllerException
+     */
     private function runRender(): void
     {
         if (empty($this->view) && is_null($this->viewParam)) {
@@ -79,11 +167,26 @@ abstract class Controller
         }
     }
 
-    private function replacer($itemPattern, $replacement, $subject): string
+    /**
+     * Procura pelo $subject usando o pattern de expressão regular e substitui pelo $replacement.
+     * 
+     * @param  string  $itemPattern
+     * @param  string  $replacement
+     * @param  string  $subject
+     * @return string
+     */
+    private function replacer(string $itemPattern, string $replacement, string $subject): string
     {
         return \preg_replace('/(?(?=(@@\s?' . $itemPattern . '\s?@@))@@\s?' . $itemPattern . '\s?@@|\0)/', $replacement, $subject);
     }
 
+    /**
+     * Define o apelido e o nome do arquivo do templete.
+     * 
+     * @param  string  $alias
+     * @param  string  $templete
+     * @return this
+     */
     public function templete(string $alias, string $templete): object
     {
         $this->templete = $templete;
@@ -91,6 +194,13 @@ abstract class Controller
         return $this;
     }
 
+    /**
+     * Renderiza o templete.
+     * 
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ControllerException
+     */
     private function runTemplete(): void
     {
         if (empty($this->templete) || empty($this->aliasTemplete)){
@@ -103,6 +213,13 @@ abstract class Controller
         $this->view = $this->replacer($this->aliasTemplete, $this->view, $templete);
     }
 
+    /**
+     * Define os assets.
+     * 
+     * @param  array  $css
+     * @param  array  $js
+     * @return this
+     */
     public function assets(array $css, array $js = []): object
     {
         $this->jsAssets = $js;
@@ -110,6 +227,13 @@ abstract class Controller
         return $this;
     }
 
+    /**
+     * Renderiza os assets.
+     * 
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ControllerException
+     */
     private function runAssets(): void
     {
         if (empty($this->jsAssets) && empty($this->cssAssets)) {
@@ -120,8 +244,10 @@ abstract class Controller
 
         $assets = [$this->cssAssets, $this->jsAssets];
 
-        if (!Arr::every($assets, 'Lib\Support\Arr::isAssoc')) {
-            throw new ControllerException('parâmetros passados não são array associativo');
+        foreach ($assets as $asset) {
+            if (!empty($asset) && !Arr::isAssoc($asset)) {
+                throw new ControllerException('parâmetros passados não são array associativo');
+            }
         }
 
         foreach ($assets as $keyAssets => $asset) {
@@ -151,12 +277,25 @@ abstract class Controller
         }
     }
 
+    /**
+     * Define os componentes
+     * 
+     * @param  array  $components
+     * @return this
+     */
     public function components(array $components): object
     {
         $this->components = $components;
         return $this;
     }
 
+    /**
+     * Renderiza os componentes.
+     * 
+     * @return void
+     * 
+     * @throws \Lib\Exceptions\ControllerException
+     */
     private function runComponents(): void
     {
         if (empty($this->components)) {
@@ -175,6 +314,14 @@ abstract class Controller
         }
     }
 
+    /**
+     * Pega o conteúdo do arquivo.
+     * 
+     * @param  array  $path
+     * @return string
+     * 
+     * @throws \Lib\Exceptions\ControllerException
+     */
     private function getContents(array $path): string
     {
         $itens = implode('/', $path);
@@ -186,6 +333,11 @@ abstract class Controller
         }
     }
 
+    /**
+     * Limpa os nomes das pastas tirando a / do começo e fim.
+     * 
+     * @return void
+     */
     private function cleanFolders(): void
     {
         $queue = [
@@ -204,6 +356,11 @@ abstract class Controller
         }
     }
 
+    /**
+     * Inicia as renderizações.
+     * 
+     * @return void
+     */
     public function run(): void
     {
         if (!$this->init) {
@@ -218,6 +375,11 @@ abstract class Controller
         $this->runRender();
     }
 
+    /**
+     * Inicia as renderizações.
+     * 
+     * @return void
+     */
     public function __destruct()
     {
         $this->run();
