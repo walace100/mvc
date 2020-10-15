@@ -5,6 +5,7 @@ namespace Lib\Http;
 use Lib\Http\Request;
 use ReflectionFunction;
 use Lib\Exceptions\RouteException;
+use ReflectionMethod;
 
 final class CallController
 {
@@ -43,11 +44,15 @@ final class CallController
         } 
 
         if ($route->closure) {
-            $closure = $this->positionParameters($route->action);
-            if (!is_null($closure)) {
-                array_splice($param, $closure, 0, [new Request($route->method)]);
-            }
+            $position = $this->positionParametersClosure($route->action);
+        } else {
+            $position = $this->positionParametersMethod('\Controllers\\' . $route->action, $route->function);
         }
+
+        if (!is_null($position)) {
+            array_splice($param, $position, 0, [new Request($route->method)]);
+        }
+
         $this->callController($route, $param);
     }
 
@@ -77,17 +82,42 @@ final class CallController
     }
 
     /**
-     * Retorna a posição do \Lib\Http\Request no callback ou do método.
+     * Retorna a posição do \Lib\Http\Request no callback.
      * 
      * @param  object  $closure
      * @return int|null
      */
-    private function positionParameters(object $closure): ?int
+    private function positionParametersClosure(object $closure): ?int
     {
         $arrayClosure = (new ReflectionFunction($closure))->getParameters();
-        $index = array_keys($arrayClosure);
+        return $this->getReflectionPos($arrayClosure);
+    }
 
-        foreach ($arrayClosure as $i => $array) {
+    /**
+     * Retorna a posição do \Lib\Http\Request no método.
+     * 
+     * @param  string  $class
+     * @param  string  $method
+     * @return int|null
+     */
+    private function positionParametersMethod(string $class, string $method): ?int
+    {
+        $arrayClosure = (new ReflectionMethod($class, $method))->getParameters();
+        return $this->getReflectionPos($arrayClosure);
+
+    }
+
+    /**
+     * Retorna a posição do \Lib\Http\Request no Reflection.
+     * 
+     * @param  array  $params
+     * @return int|null
+     */
+    private function getReflectionPos(array $params): ?int
+    {
+        $index = array_keys($params);
+
+        foreach ($params as $i => $array) {
             if ($array->getType() && $array->getType()->getName() == 'Lib\Http\Request') {
                 return $index[$i];
             }

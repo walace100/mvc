@@ -3,14 +3,11 @@
 namespace Controllers;
 
 use Lib\Controllers\Controller;
+use Lib\Http\Request;
 
-class Home extends Controller
+class HomeController extends Controller
 {
-    public function __construct()
-    {
-        
-    }
-    public function index()
+    public function index(Request $request)
     {
         $this
         ->render("index", null)
