@@ -1,3 +1,1 @@
-@ '$oi;'; @
-@@ components @@
-@@js2@@
+@ '<h1>Bem-vindo</h1>'; @

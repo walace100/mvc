@@ -40,4 +40,23 @@ class Arr
             throw new GeralException('ocorreu um erro: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Insere um valor no array.
+     * 
+     * @param  array  &$array
+     * @param  int  $position
+     * @param  mixed  $insert
+     * @return array
+     * 
+     * @throws \Lib\Exceptions\GeralException
+     */
+    public static function insert(&$array, $position, $insert): array
+    {
+        try {
+            return array_splice($array, $position, 0, $insert);
+        } catch (\Exception $e) {
+            throw new GeralException('ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 }

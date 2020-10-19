@@ -43,7 +43,7 @@ abstract class Model extends DBConnection
             $statement->execute();
             return $statement;
         } catch (PDOException $e) {
-            throw new ModelException('ocorreu um erro: ' . $e->getMessage());
+            throw new ModelException('ocorreu um erro: ' . $e->getMessage() . '<br> SQL: ' . $query);
         }
     }
 

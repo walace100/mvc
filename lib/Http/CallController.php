@@ -6,6 +6,7 @@ use Lib\Http\Request;
 use ReflectionFunction;
 use Lib\Exceptions\RouteException;
 use ReflectionMethod;
+use Lib\Support\Arr;
 
 final class CallController
 {
@@ -50,7 +51,7 @@ final class CallController
         }
 
         if (!is_null($position)) {
-            array_splice($param, $position, 0, [new Request($route->method)]);
+            Arr::insert($param, $position, [new Request($route->method)]);
         }
 
         $this->callController($route, $param);
