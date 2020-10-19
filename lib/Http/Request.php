@@ -3,33 +3,16 @@
 namespace Lib\Http;
 
 use Lib\Http\Session;
+use Lib\Exceptions\GeralException;
 
 final class Request
 {
-    /**
-     * Armazena o método da rota.
-     * 
-     * @var string
-     */
-    private $method;
-
     /**
      * Armazena o atributo a ser verificado se existe.
      * 
      * @var string
      */
     private $has;
-
-    /**
-     * Define o valor do método.
-     * 
-     * @param  string  $method
-     * @return void
-     */
-    public function __construct(string $method)
-    {
-        $this->method = \strtolower($method);
-    }
 
     /**
      * Verifica o se o método existe e o chama.
@@ -40,11 +23,14 @@ final class Request
      */
     public function __call(string $nameMethod, $_ = null): ?object
     {
-        if ($nameMethod === $this->method || $this->method === 'any') {
+        $methods = ['get', 'post', 'any'];
+
+        if (in_array($nameMethod, $methods)) {
             return eval('return $this->$nameMethod();');
         } elseif ($nameMethod === 'session') {
             return $this->session();
         }
+        throw new GeralException('Método não existe');
         return null;
     }
 

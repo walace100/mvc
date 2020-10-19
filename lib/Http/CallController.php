@@ -51,7 +51,7 @@ final class CallController
         }
 
         if (!is_null($position)) {
-            Arr::insert($param, $position, [new Request($route->method)]);
+            Arr::insert($param, $position, [new Request()]);
         }
 
         $this->callController($route, $param);
