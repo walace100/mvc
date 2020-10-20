@@ -57,6 +57,10 @@ abstract class Model extends DBConnection
      */
     public function insert(array $attributes, array $values, ?string $table = null): void
     {
+        if (Arr::isAssoc($attributes) || Arr::isAssoc($values)) {
+            throw new ModelException('Os Parâmetros não podem ser um array associativo');
+        }
+
         [$fields, $table] = $this->setFields($attributes, $table);
         $protectedValues = implode(',', array_fill(0, count($values), '?'));
 
