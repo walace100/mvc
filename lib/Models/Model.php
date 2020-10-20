@@ -132,7 +132,7 @@ abstract class Model extends DBConnection
     }
 
     /**
-     * Atualiza um registro do banco de dados.
+     * Deleta um registro do banco de dados.
      * 
      * @param  string  $attribute
      * @param  mixed  $value
