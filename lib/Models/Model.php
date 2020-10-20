@@ -127,7 +127,7 @@ abstract class Model extends DBConnection
         [$set, $where] = $this->setCompareFields([$setValueAssoc, $compareValueAssoc], $logicAND, $logicPos);
         $values = [...array_values($setValueAssoc), ...array_values($compareValueAssoc)];
 
-        $sql = "UPDATE $table SET $set WHERE $where";
+        $sql = "UPDATE $table SET $set WHERE $where LIMIT $limit";
         $this->querySt($sql, $values);
     }
 
