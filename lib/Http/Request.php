@@ -91,7 +91,7 @@ final class Request
             if (\property_exists($object, $this->has)) {
                 return $object;
             } else {
-                eval('$class->' . $this->has . '= null;');
+                eval('$object->' . $this->has . '= null;');
                 return $object;
             }
         }
