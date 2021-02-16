@@ -91,8 +91,12 @@ final class Session
      */
     public function id(string $id = null): string
     {
-        $this->start();
-        return session_id($id);
+        if (is_null($id)) {
+            return session_id();
+        } else {
+            $this->start();
+            return session_id($id);
+        }
     }
 
     /**
