@@ -263,7 +263,12 @@ abstract class Controller
                     $path = [APPBASE, $this->viewPath, $this->assetsPath, $link, $value];
                 }
 
-                $path = $_SERVER['REQUEST_SCHEME'] . '://' . implode('/', $path); 
+                 if (isset($_SERVER['REQUEST_SCHEME'])) {
+                    $path = 'https://' . implode('/', $path); 
+                } else {
+                    $path = 'http://' . implode('/', $path); 
+                }
+            
                 $path = str_replace('\\', '/', $path);
 
                 if ($keyAssets === 0) {
